@@ -51,8 +51,8 @@ export async function initEarth(
 
   // Add terrain
   const loader = new THREE.TextureLoader();
-  const heightTexture = await loader.loadAsync("/height.png");
-  const normalTexture = await loader.loadAsync("/normal.png");
+  const heightTexture = await loader.loadAsync("height.png");
+  const normalTexture = await loader.loadAsync("normal.png");
   const climate = await fetchClimate();
 
   heightTexture.magFilter = THREE.LinearFilter;

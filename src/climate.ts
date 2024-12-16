@@ -24,9 +24,9 @@ function createTexture(data: Uint8Array, width: number, height: number, channels
 
 export async function fetchClimate() {
   const [climateBytes, sealevelFloats, iceBytes] = await Promise.all([
-    fetchBytes("/climate.bin"),
-    fetchFloats("/sealevels.bin"),
-    fetchBytes("/ice.bin")
+    fetchBytes("climate.bin"),
+    fetchFloats("sealevels.bin"),
+    fetchBytes("ice.bin")
   ]);
 
   const years = [];
@@ -140,7 +140,7 @@ export function getClimateYear(data: FetchClimateResult, year: number) {
   return Math.min(data.years.length - 1, yearIndex);
 }
 
-export function getIceYear(data: FetchClimateResult, year: number) {
+export function getIceYear(_: FetchClimateResult, year: number) {
   // Steps of 2.5 years
   const iceIndex = year / 2.5;
   return Math.max(0, Math.min(32, iceIndex));

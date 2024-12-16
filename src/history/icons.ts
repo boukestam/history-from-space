@@ -1,6 +1,4 @@
-import { Historical } from "./history";
 import IconsText from "./icons.txt?raw";
-import { CURRENT_YEAR } from "../timeline";
 
 // Example icons.txt file:
 /*

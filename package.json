@@ -8,13 +8,15 @@
     "host": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build --base=/human-history/ && gh-pages -d dist"
   },
   "dependencies": {
     "@types/three": "^0.170.0",
     "three": "^0.171.0"
   },
   "devDependencies": {
+    "gh-pages": "^6.2.0",
     "globals": "^15.13.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.3"

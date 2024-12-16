@@ -1,7 +1,7 @@
 Tool
-/Tool.svg
+Tool.svg
 #FFEABB
 
 Sphinx
-/Sphinx.svg
+Sphinx.svg
 #EDDCCF

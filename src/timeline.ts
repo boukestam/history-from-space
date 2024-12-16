@@ -1,5 +1,3 @@
-import { clamp } from "three/src/math/MathUtils.js";
-
 export const CURRENT_YEAR = new Date().getFullYear();
 export const MIN_YEAR = -100000;
 export const MAX_YEAR = CURRENT_YEAR;
@@ -246,7 +244,7 @@ export async function initTimeline(
     if (panning) onPan(e.movementX);
   });
 
-  document.addEventListener('mouseup', (e) => {
+  document.addEventListener('mouseup', () => {
     moving = false;
     panning = false;
   });
