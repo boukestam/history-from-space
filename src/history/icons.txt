@@ -1,0 +1,7 @@
+Tool
+/Tool.svg
+#FFEABB
+
+Sphinx
+/Sphinx.svg
+#EDDCCF

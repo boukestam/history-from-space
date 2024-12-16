@@ -1,0 +1,22 @@
+{
+  "name": "vite-react-typescript-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "host": "vite --host",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/three": "^0.170.0",
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "globals": "^15.13.0",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
+  }
+}

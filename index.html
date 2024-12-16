@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/Tool.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>History from Space</title>
+  </head>
+  <body oncontextmenu="return false;">
+    <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; height: 100vh;">
+      <canvas id="timeline" style="width: 100%; height: 100px;"></canvas>
+
+      <div id="earth-wrapper">
+        <div id="earth"></div>
+      </div>
+
+      <select id="visualisation">
+        <option value="0">Earth</option>
+        <option value="1">Max temperature</option>
+        <option value="2">Min temperature</option>
+        <option value="3">Precipitation</option>
+      </select>
+    </div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
