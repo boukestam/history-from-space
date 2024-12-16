@@ -4075,11 +4075,11 @@ Inca\r
 
 `).map(t=>{const[e,n,r]=t.split(`
 `),[s,a]=n.split(","),[o,l]=r.split(",").map(c=>c==="present"?Dr:parseFloat(c));return{name:e,type:"location",period:[parseFloat(s),parseFloat(a)],coordinate:[o,l]}})}const Bm=`Tool\r
-/Tool.svg\r
+Tool.svg\r
 #FFEABB\r
 \r
 Sphinx\r
-/Sphinx.svg\r
+Sphinx.svg\r
 #EDDCCF`;function zm(){return Bm.replace(/\r\n/g,`
 `).split(`
 
