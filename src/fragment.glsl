@@ -2,6 +2,7 @@ uniform sampler2DArray tempTexture;
 uniform sampler2DArray precTexture;
 uniform sampler2DArray iceTexture;
 uniform sampler2D heightTexture;
+uniform sampler2D featuresTexture;
 uniform float sealevel;
 uniform float climateYear;
 uniform float iceYear;
@@ -88,6 +89,9 @@ void main() {
     height = (heightIntensity - 200.0) / 50.0 * 5724.0;
   }
 
+  vec4 featuresColor = texture2D(featuresTexture, vUv);
+  float featuresIntensity = featuresColor.r;
+
   // Invert y axis
   vec2 uv = vec2(vUv.x + 0.5, 1.0 - vUv.y);
 
@@ -118,6 +122,7 @@ void main() {
     outColor = color * darkness;
   }
 
+  outColor = slideColor(outColor, waterColor, featuresIntensity, 0.0, 1.0);
   outColor = slideColor(outColor, snowColor, ice, 0.0, 0.1);
 
   if (visualisation == 1) {

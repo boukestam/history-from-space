@@ -52,6 +52,7 @@ export async function initEarth(
   // Add terrain
   const loader = new THREE.TextureLoader();
   const heightTexture = await loader.loadAsync("height.png");
+  const featuresTexture = await loader.loadAsync("features.png");
   const normalTexture = await loader.loadAsync("normal.png");
   const climate = await fetchClimate();
 
@@ -60,6 +61,12 @@ export async function initEarth(
   heightTexture.wrapS = THREE.RepeatWrapping;
   heightTexture.wrapT = THREE.RepeatWrapping;
   heightTexture.needsUpdate = true;
+
+  featuresTexture.magFilter = THREE.LinearFilter;
+  featuresTexture.minFilter = THREE.LinearFilter;
+  featuresTexture.wrapS = THREE.RepeatWrapping;
+  featuresTexture.wrapT = THREE.RepeatWrapping;
+  featuresTexture.needsUpdate = true;
 
   normalTexture.magFilter = THREE.LinearFilter;
   normalTexture.minFilter = THREE.LinearFilter;
@@ -75,6 +82,7 @@ export async function initEarth(
     fragmentShader,
     uniforms: {
       heightTexture: { value: heightTexture },
+      featuresTexture: { value: featuresTexture },
       normalTexture: { value: normalTexture },
       tempTexture: { value: climate.climateTextures.temp },
       precTexture: { value: climate.climateTextures.prec },

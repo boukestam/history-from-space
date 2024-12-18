@@ -26,6 +26,7 @@ export type HistoricalEventType = 'arrow' | 'marker';
 
 export interface HistoricalEvent extends Historical {
   icon: string;
+  time: number;
   eventType: HistoricalEventType;
   coordinates: [number, number][][];
 }
@@ -36,8 +37,7 @@ export function loadEvents(locations: HistoricalLocation[]): HistoricalEvent[] {
   return eventParts.map((eventPart) => {
     const lines = eventPart.split("\n");
 
-    const [name, period, icon, type] = lines.slice(0, 4);
-    const [start, end] = period.split(",");
+    const [name, time, icon, type] = lines.slice(0, 4);
 
     const coordinates: [number, number][][] = [[]];
 
@@ -66,10 +66,17 @@ export function loadEvents(locations: HistoricalLocation[]): HistoricalEvent[] {
       coordinates[coordinates.length - 1].push(coordinate);
     }
 
+    const timeFloat = parseFloat(time);
+    const inPast = CURRENT_YEAR - timeFloat;
+    const margin = inPast * 0.1;
+    const start = timeFloat - margin;
+    const end = timeFloat + margin;
+
     const event: HistoricalEvent = {
       name: name.replace("\\n", "\n"),
       type: 'event',
-      period: [parseFloat(start), parseFloat(end)],
+      time: timeFloat,
+      period: [start, end],
       icon,
       eventType: type as 'arrow' | 'marker',
       coordinates

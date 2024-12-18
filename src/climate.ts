@@ -110,8 +110,6 @@ export async function fetchClimate() {
     }
   }
 
-  console.log(iceData);
-
   const iceTexture = createTexture(iceData, iceWidth, iceHeight, iceYears);
 
   return {

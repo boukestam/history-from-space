@@ -1,33 +1,77 @@
 Migration out\nof Africa
--80000,-70000
+-70000
 Tool
 arrow
-27.90,30.25
-31.26,37.01
-37.00,37.74
-40.26,27.88
-47.09,18.27
--
-32.77,37.72
-33.23,44.13
-31.44,53.21
-29.83,62.41
-27.92,72.83
-27.27,77.69
+5.09,35.88
+11.11,40.30
+17.17,45.34
+21.12,46.52
 
 Migration to\nAustralia
--50000,-45000
+-65000
 Tool
 arrow
-18.74,97.93
-8.60,98.86
--1.38,102.07
--7.49,109.92
--9.75,123.86
--20.87,132.20
+25.47,54.94
+28.16,61.03
+25.18,70.56
+21.66,71.65
+18.21,72.99
+13.56,75.32
+9.93,77.35
+15.36,79.90
+18.80,82.52
+21.49,86.51
+22.27,90.03
+19.67,94.86
+16.68,95.87
+12.79,98.58
+8.62,99.03
+2.43,101.33
+-2.23,104.51
+-5.79,109.94
+-7.58,114.40
+-8.65,121.84
+-11.23,127.93
+-16.09,132.46
+
+Migration to\nEurope
+-45000
+Tool
+arrow
+23.79,75.42
+30.24,67.28
+32.29,59.09
+33.15,49.20
+34.97,41.26
+38.37,32.25
+42.82,23.78
+45.92,18.96
+
+Migration to\nAsia
+-45000
+Tool
+arrow
+21.26,77.66
+25.01,80.80
+26.56,86.54
+27.39,92.13
+27.55,97.35
+29.74,103.11
+
+Oldest cave\npaintings
+-45000
+Tool
+marker
+-4.78,119.66
+
+Bone flutes\nin Swabia Jura
+-42000
+Tool
+marker
+48.40,9.77
 
 Migration to\nAmerica
--20000,-15000
+-25000
 Tool
 arrow
 32.45,120.07
@@ -43,14 +87,68 @@ arrow
 11.64,-86.11
 5.27,-74.30
 
-Oldest cave\npaintings
--45000,-40000
+White sands footprints
+-22000
 Tool
 marker
--4.78,119.66
+32.87,-106.32
+
+Earliest pottery\nin Xianren Cave
+-20000
+Tool
+marker
+29.56,115.96
+
+Magdalenian culture
+-17000
+Tool
+marker
+43.5,-0.2
+
+Domesticated dog\nin Oberkassel Bonn
+-14000
+Tool
+marker
+50.73,7.13
+
+First religious site
+-9500
+Tool
+marker
+Göbekli Tepe
+
+First fortified city
+-9000
+Tool
+marker
+Jericho
+
+Cultivation of\nwheat and barley
+-8500
+Tool
+marker
+Mesopotamia
+
+Cultivation of rice
+-7500
+Tool
+marker
+Yangtze River Valley
+
+First large\norganised settlement
+-7500
+Tool
+marker
+Catalhoyuk
+
+Vinca culture
+-5700
+Tool
+marker
+44.80,20.58
 
 Unification of Egypt
--3200,-3100
+-3150
 Sphinx
 marker
 Egypt

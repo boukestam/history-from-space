@@ -65,11 +65,11 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     skipToPreviousEvent: () => {
       const currentYear = timeline.year();
       const previousEvent = events.slice()
-        .sort((a, b) => b.period[1] - a.period[1])
-        .find(event => event.period[1] < currentYear);
+        .sort((a, b) => b.time - a.time)
+        .find(event => event.time < currentYear);
 
       if (previousEvent) {
-        timeline.setYear((previousEvent.period[0] + previousEvent.period[1]) / 2);
+        timeline.setTarget(previousEvent.time);
         earth.setTarget(getCoordinateCenter(previousEvent.coordinates[0]));
       }
     },
@@ -77,11 +77,11 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     skipToNextEvent: () => {
       const currentYear = timeline.year();
       const nextEvent = events.slice()
-        .sort((a, b) => a.period[0] - b.period[0])
-        .find(event => event.period[0] > currentYear);
+        .sort((a, b) => a.time - b.time)
+        .find(event => event.time > currentYear);
 
       if (nextEvent) {
-        timeline.setYear((nextEvent.period[0] + nextEvent.period[1]) / 2);
+        timeline.setTarget(nextEvent.time);
         earth.setTarget(getCoordinateCenter(nextEvent.coordinates[0]));
       }
     }

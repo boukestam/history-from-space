@@ -313,8 +313,35 @@ export async function initTimeline(
 
   render();
 
+  let target = -1;
+
+  function update() {
+    if (target === -1) return;
+
+    const delta = target - year;
+    const step = delta * 0.1;
+
+    if (Math.abs(step) < 0.1) {
+      year = target;
+      target = -1;
+    } else {
+      year += step;
+      minYear += step;
+      maxYear += step;
+
+      clampPan(maxYear - minYear);
+    }
+
+    onYearChange(year);
+
+    saveView();
+    render();
+
+    setTimeout(update, 1000 / 30);
+  }
+
   return {
-    year: () => year,
+    year: () => target === -1 ? year : target,
 
     setYear: (newYear: number) => {
       year = newYear;
@@ -341,7 +368,12 @@ export async function initTimeline(
 
       markers.push({ year, label, color, icon: img });
       render();
-    }
+    },
+
+    setTarget: (newTarget: number) => {
+      target = newTarget;
+      update();
+    },
   };
 }
 
