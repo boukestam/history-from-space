@@ -79,14 +79,17 @@ void main() {
   vec4 heightColor = texture2D(heightTexture, vUv);
   float heightIntensity = heightColor.r * 255.0;
 
+  // gl_FragColor = heightColor;
+  // return;
+
   float height = 0.0;
 
-  if (heightIntensity < 50.0) {
-    height = (50.0 - heightIntensity) / 50.0 * -8714.0;
-  } else if (heightIntensity <= 200.0) {
-    height = heightIntensity - 200.0;
+  if (heightIntensity < 25.0) {
+    height = -150.0 + (25.0 - heightIntensity) / 25.0 * -8714.0;
+  } else if (heightIntensity <= 230.0) {
+    height = heightIntensity - 175.0;
   } else {
-    height = (heightIntensity - 200.0) / 50.0 * 5724.0;
+    height = (heightIntensity - 230.0) / 25.0 * 5724.0;
   }
 
   vec4 featuresColor = texture2D(featuresTexture, vUv);
