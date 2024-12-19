@@ -14,22 +14,32 @@ Caral
 */
 
 export interface HistoricalLocation extends Historical {
-  coordinate: [number, number];
+  coordinates: [number, number][];
 }
 
 export function loadLocations(): HistoricalLocation[] {
   const locationParts = LocationsText.replace(/\r\n/g, "\n").split("\n\n");
 
-  return locationParts.map((locationPart) => {
-    const [name, period, coordinate] = locationPart.split("\n");
-    const [start, end] = period.split(",");
-    const [lat, lon] = coordinate.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c));
+  const locations: HistoricalLocation[] = locationParts.map((locationPart) => {
+    const lines = locationPart.split("\n");
 
-    return {
+    const name = lines[0];
+    const period = lines[1];
+    const [start, end] = period.split(",");
+
+    const coordinates = lines.slice(2).map(line =>
+      line.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c)) as [number, number]
+    );
+
+    const location: HistoricalLocation = {
       name,
       type: 'location',
       period: [parseFloat(start), parseFloat(end)],
-      coordinate: [lat, lon]
+      coordinates: coordinates
     };
+
+    return location;
   });
+
+  return locations;
 }

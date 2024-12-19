@@ -1,10 +1,13 @@
+import { initControls } from './controls';
 import { EarthItem, initEarth } from './earth';
 import { initHistory } from './history/history';
-import './index.css';
 import { initTimeline, toKYear } from './timeline';
+
+import './index.css';
 
 const earthWrapperElement = document.getElementById('earth-wrapper') as HTMLDivElement;
 const earthElement = document.getElementById('earth') as HTMLDivElement;
+const timelineElement = document.getElementById('timeline') as HTMLCanvasElement;
 
 function resizeEarthElement() {
   const bounds = earthWrapperElement.getBoundingClientRect();
@@ -18,9 +21,6 @@ resizeEarthElement();
 
 window.addEventListener('resize', resizeEarthElement);
 
-const timelineElement = document.getElementById('timeline') as HTMLCanvasElement;
-const visualisationElement = document.getElementById('visualisation') as HTMLSelectElement;
-
 async function init() {
   const timeline = await initTimeline(timelineElement, (newYear) => {
     earth.setYear(toKYear(newYear));
@@ -28,19 +28,15 @@ async function init() {
   });
 
   const coordinates: [number, number][] = [];
-  let arrow: EarthItem | undefined;
+  let shape: EarthItem | undefined;
 
   document.addEventListener('keyup', (event) => {
     if (event.key === 'Escape') {
       coordinates.length = 0;
-      if (arrow) {
-        arrow.remove();
-        arrow = undefined;
+      if (shape) {
+        shape.remove();
+        shape = undefined;
       }
-    } else if (event.key === "ArrowLeft") {
-      history.skipToPreviousEvent();
-    } else if (event.key === "ArrowRight") {
-      history.skipToNextEvent();
     }
   });
 
@@ -55,22 +51,20 @@ async function init() {
       `${coordinate[0].toFixed(2)},${coordinate[1].toFixed(2)}`
     ).join('\n'));
 
-    if (arrow) {
-      arrow.remove();
-      arrow = undefined;
+    if (shape) {
+      shape.remove();
+      shape = undefined;
     }
 
     if (coordinates.length >= 2) {
-      arrow = earth.addArrow(coordinates, 'New arrow');
+      //shape = earth.addArrow(coordinates, 'New arrow');
+      shape = earth.addArea(coordinates, 'New area');
     }
   });
 
-  visualisationElement.addEventListener('change', () => {
-    const value = visualisationElement.value;
-    earth.setVisualisation(parseInt(value));
-  });
-
   const history = await initHistory(earth, timeline, timeline.year());
+
+  initControls(history, earth);
 }
 
 init().catch(console.error);

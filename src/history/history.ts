@@ -15,17 +15,14 @@ export interface Historical {
 }
 
 export async function initHistory(earth: Earth, timeline: Timeline, initialYear: number) {
-  const locations = loadLocations();
-  const events = loadEvents(locations);
   const icons = loadIcons();
+  const locations = loadLocations();
+  const events = loadEvents(locations, icons);
 
   const items = [...locations, ...events].sort((a, b) => a.period[0] - b.period[0]);
 
   for (const event of events) {
-    const icon = icons.find(icon => icon.name === event.icon);
-    if (!icon) throw new Error(`Icon not found: ${event.icon}`);
-
-    timeline.addMarker((event.period[0] + event.period[1]) / 2, event.name, icon.color, icon.url);
+    timeline.addEvent(event);
   }
 
   function updateMap(year: number) {
@@ -40,7 +37,12 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
 
         if (item.type === 'location') {
           const location = item as HistoricalLocation;
-          location.removable = earth.addMarker(location.coordinate, location.name);
+
+          if (location.coordinates.length === 1) {
+            location.removable = earth.addMarker(location.coordinates[0], location.name);
+          } else {
+            location.removable = earth.addArea(location.coordinates, location.name);
+          }
         } else if (item.type === 'event') {
           const event = item as HistoricalEvent;
 
@@ -87,3 +89,5 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     }
   };
 }
+
+export type HistoryManager = Awaited<ReturnType<typeof initHistory>>;

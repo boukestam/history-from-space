@@ -2,6 +2,8 @@ import { Historical } from "./history";
 import EventsText from "./events.txt?raw";
 import { HistoricalLocation } from "./locations";
 import { CURRENT_YEAR } from "../timeline";
+import { Icon } from "./icons";
+import { getCoordinateCenter } from "../coordinate";
 
 // Example events.txt file:
 /*
@@ -25,13 +27,13 @@ Egypt
 export type HistoricalEventType = 'arrow' | 'marker';
 
 export interface HistoricalEvent extends Historical {
-  icon: string;
+  icon: Icon;
   time: number;
   eventType: HistoricalEventType;
   coordinates: [number, number][][];
 }
 
-export function loadEvents(locations: HistoricalLocation[]): HistoricalEvent[] {
+export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): HistoricalEvent[] {
   const eventParts = EventsText.replace(/\r\n/g, "\n").split("\n\n");
 
   return eventParts.map((eventPart) => {
@@ -60,7 +62,7 @@ export function loadEvents(locations: HistoricalLocation[]): HistoricalEvent[] {
         if (!location) {
           throw new Error(`Location not found: ${line}`);
         }
-        coordinate = location.coordinate;
+        coordinate = getCoordinateCenter(location.coordinates);
       }
 
       coordinates[coordinates.length - 1].push(coordinate);
@@ -77,7 +79,7 @@ export function loadEvents(locations: HistoricalLocation[]): HistoricalEvent[] {
       type: 'event',
       time: timeFloat,
       period: [start, end],
-      icon,
+      icon: icons.find(i => i.name === icon) as Icon,
       eventType: type as 'arrow' | 'marker',
       coordinates
     };

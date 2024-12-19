@@ -1,3 +1,5 @@
+import { HistoricalEvent } from "./history/events";
+
 export const CURRENT_YEAR = new Date().getFullYear();
 export const MIN_YEAR = -100000;
 export const MAX_YEAR = CURRENT_YEAR;
@@ -85,10 +87,8 @@ export async function initTimeline(
   ctx.font = '12px Tahoma';
 
   const markers: {
-    year: number;
-    label: string;
-    color: string;
-    icon: HTMLImageElement;
+    event: HistoricalEvent;
+    image: HTMLImageElement;
   }[] = [];
 
   function render() {
@@ -129,23 +129,18 @@ export async function initTimeline(
     ctx.fillText(yearToString(year, 1), x, 13);
 
     for (const marker of markers) {
-      const x = yearToX(marker.year, minYear, maxYear, size.width);
+      const x = yearToX(marker.event.time, minYear, maxYear, size.width);
 
-      // Don't render year if it's too close to a step
-      if (!steps.some((s) => Math.abs(s - x) < 50)) {
-        ctx.fillStyle = 'lightgray';
-        ctx.fillText(yearToString(marker.year, 1), x, 13);
-      }
+      const markerRadius = 12;
+      const markerImageSize = 16;
+      const markerY = 30;
 
-      ctx.fillStyle = marker.color;
+      ctx.fillStyle = marker.event.icon.color;
       ctx.beginPath();
-      ctx.arc(x, 60, 24, 0, Math.PI * 2);
+      ctx.arc(x, markerY, markerRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.drawImage(marker.icon, x - 16, 60 - 16, 32, 32);
-
-      ctx.fillStyle = "white";
-      ctx.fillText(marker.label, x, size.height - 2);
+      ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
     }
 
     ctx.restore();
@@ -358,16 +353,18 @@ export async function initTimeline(
       render();
     },
 
-    addMarker(year: number, label: string, color: string, icon: string) {
+    addEvent(event: HistoricalEvent) {
       const img = new Image();
-      img.src = icon;
+      img.src = event.icon.url;
+
+      markers.push({
+        event,
+        image: img,
+      });
 
       img.onload = () => {
         render();
       };
-
-      markers.push({ year, label, color, icon: img });
-      render();
     },
 
     setTarget: (newTarget: number) => {

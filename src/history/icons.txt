@@ -2,6 +2,14 @@ Tool
 Tool.svg
 #FFEABB
 
+Farming
+Wheat.svg
+#CFEDD1
+
+Settlement
+Hut.svg
+#E8EDCF
+
 Sphinx
 Sphinx.svg
 #EDDCCF

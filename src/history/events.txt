@@ -105,45 +105,39 @@ Tool
 marker
 43.5,-0.2
 
-Domesticated dog\nin Oberkassel Bonn
--14000
-Tool
-marker
-50.73,7.13
-
 First religious site
 -9500
-Tool
+Settlement
 marker
 Göbekli Tepe
 
 First fortified city
 -9000
-Tool
+Settlement
 marker
 Jericho
 
 Cultivation of\nwheat and barley
 -8500
-Tool
+Farming
 marker
 Mesopotamia
 
 Cultivation of rice
--7500
-Tool
+-8000
+Farming
 marker
 Yangtze River Valley
 
 First large\norganised settlement
 -7500
-Tool
+Settlement
 marker
 Catalhoyuk
 
 Vinca culture
 -5700
-Tool
+Settlement
 marker
 44.80,20.58
 

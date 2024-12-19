@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+import { DataArrayTexture } from "three/src/textures/DataArrayTexture.js";
+import { LinearFilter, RepeatWrapping } from "three/src/Three.WebGPU.js";
 
 async function fetchFloats(url: string): Promise<Float32Array> {
   const response = await fetch(url);
@@ -13,11 +14,11 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
 }
 
 function createTexture(data: Uint8Array, width: number, height: number, channels: number) {
-  const texture = new THREE.DataArrayTexture(data, width, height, channels);
-  texture.magFilter = THREE.LinearFilter;
-  texture.minFilter = THREE.LinearFilter;
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
+  const texture = new DataArrayTexture(data, width, height, channels);
+  texture.magFilter = LinearFilter;
+  texture.minFilter = LinearFilter;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
   texture.needsUpdate = true;
   return texture;
 }
