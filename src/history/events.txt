@@ -135,12 +135,6 @@ Settlement
 marker
 Catalhoyuk
 
-Vinca culture
--5700
-Settlement
-marker
-44.80,20.58
-
 Unification of Egypt
 -3150
 Sphinx

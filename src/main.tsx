@@ -1,11 +1,12 @@
 import { initControls } from './controls';
-import { EarthItem, initEarth } from './earth';
+import { Earth, EarthItem } from './earth';
 import { initHistory } from './history/history';
 import { initTimeline, toKYear } from './timeline';
 
 import './index.css';
 
 const earthWrapperElement = document.getElementById('earth-wrapper') as HTMLDivElement;
+const earthOverlayElement = document.getElementById('earth-overlay') as HTMLDivElement;
 const earthElement = document.getElementById('earth') as HTMLDivElement;
 const timelineElement = document.getElementById('timeline') as HTMLCanvasElement;
 
@@ -40,7 +41,7 @@ async function init() {
     }
   });
 
-  const earth = await initEarth(earthElement, toKYear(timeline.year()), (coordinate, button) => {
+  const earth = new Earth(earthElement, earthOverlayElement, toKYear(timeline.year()), (coordinate, button) => {
     if (button === 0) {
       coordinates.push(coordinate);
     } else if (button === 2) {
@@ -58,9 +59,11 @@ async function init() {
 
     if (coordinates.length >= 2) {
       //shape = earth.addArrow(coordinates, 'New arrow');
-      shape = earth.addArea(coordinates, 'New area');
+      shape = earth.addArea(coordinates, 'New area', true);
     }
   });
+
+  await earth.load();
 
   const history = await initHistory(earth, timeline, timeline.year());
 

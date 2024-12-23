@@ -1,194 +1,410 @@
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { fetchClimate, getSeaLevel, getClimateYear, getIceYear } from './climate';
-
-import vertexShader from './vertex.glsl?raw';
-import fragmentShader from './fragment.glsl?raw';
+import { fetchClimate, getSeaLevel, getClimateYear, getIceYear, FetchClimateResult } from './climate';
 import { coordinateToVec3, vec3ToCoordinate } from './coordinate';
-import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer.js';
-import { AmbientLight, BufferAttribute, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, BufferGeometry, CanvasTexture, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Sprite, SpriteMaterial, Vector2, Vector3 } from 'three/src/Three.WebGPU.js';
-import { Earcut } from 'three/src/extras/Earcut.js';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { WebGLRenderer, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Vector2, Vector3, Texture } from 'three';
+import { areaToGeometry, curveToGeometry, generateSphere } from './curve';
+
+import earthVertexShader from './earth-vertex.glsl?raw';
+import earthFragmentShader from './earth-fragment.glsl?raw';
+import riverFragmentShader from './river-fragment.glsl?raw';
+import areaFragmentShader from './area-fragment.glsl?raw';
+import arrowFragmentShader from './arrow-fragment.glsl?raw';
 
 export interface EarthItem {
   remove: () => void;
 }
 
-export async function initEarth(
-  wrapper: HTMLDivElement,
-  year: number,
-  onClick: (coordinate: [number, number], button: number) => void
-) {
-  const bounds = wrapper.getBoundingClientRect();
+export interface EarthMarker extends EarthItem {
+  marker: Mesh;
+  label: EarthLabel;
+}
 
-  const renderer = new WebGLRenderer({ antialias: true });
-  renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setSize(bounds.width, bounds.height);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  wrapper.appendChild(renderer.domElement);
+export interface EarthArrow extends EarthItem {
+  arrow: Mesh;
+  label?: EarthLabel;
+}
 
-  window.addEventListener("resize", () => {
-    const bounds = wrapper.getBoundingClientRect();
-    renderer.setSize(bounds.width, bounds.height);
-    camera.aspect = bounds.width / bounds.height;
-    camera.updateProjectionMatrix();
-    render();
-  });
+export interface EarthArea extends EarthItem {
+  area: Mesh;
+  label?: EarthLabel;
+}
 
-  const scene = new Scene();
+export interface EarthLabel {
+  element: HTMLDivElement;
+  position: Vector3;
+  height: number;
+}
 
-  const camera = new PerspectiveCamera(45, bounds.width / bounds.height, 0.01, 10);
+const ABOVE_TERRAIN = 1.003;
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.1;
-  controls.enablePan = false;
+const AREA_COLORS = [
+  new Vector3(229 / 255, 57 / 255, 53 / 255),
+  new Vector3(216 / 255, 27 / 255, 96 / 255),
+  new Vector3(142 / 255, 36 / 255, 170 / 255),
+  new Vector3(94 / 255, 53 / 255, 177 / 255),
+  new Vector3(57 / 255, 73 / 255, 171 / 255),
+  new Vector3(0 / 255, 172 / 255, 193 / 255),
+  new Vector3(0 / 255, 137 / 255, 123 / 255),
+  new Vector3(255 / 255, 179 / 255, 0 / 255),
+  new Vector3(251 / 255, 140 / 255, 0 / 255),
+  new Vector3(244 / 255, 81 / 255, 30 / 255),
+];
 
-  // Load camera position from local storage for development
-  const cameraPosition = localStorage.getItem("camera");
-  if (cameraPosition) {
-    camera.position.copy(JSON.parse(cameraPosition));
-  } else {
-    camera.position.set(0, 0, 3);
-  }
-  controls.update();
+export function getAreaColor(name: string) {
+  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return AREA_COLORS[hash % AREA_COLORS.length];
+}
 
-  // Add terrain
-  const loader = new TextureLoader();
-  const heightTexture = await loader.loadAsync("height.png");
-  const featuresTexture = await loader.loadAsync("features.png");
-  const normalTexture = await loader.loadAsync("normal.png");
-  const climate = await fetchClimate();
+function setTextureParameters(texture: Texture) {
+  texture.magFilter = LinearFilter;
+  texture.minFilter = LinearFilter;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.needsUpdate = true;
+}
 
-  heightTexture.magFilter = LinearFilter;
-  heightTexture.minFilter = LinearFilter;
-  heightTexture.wrapS = RepeatWrapping;
-  heightTexture.wrapT = RepeatWrapping;
-  heightTexture.needsUpdate = true;
+export class Earth {
 
-  featuresTexture.magFilter = LinearFilter;
-  featuresTexture.minFilter = LinearFilter;
-  featuresTexture.wrapS = RepeatWrapping;
-  featuresTexture.wrapT = RepeatWrapping;
-  featuresTexture.needsUpdate = true;
+  wrapper: HTMLDivElement;
+  overlay: HTMLDivElement;
+  year: number;
+  onClick: (coordinate: [number, number], button: number) => void;
 
-  normalTexture.magFilter = LinearFilter;
-  normalTexture.minFilter = LinearFilter;
-  normalTexture.wrapS = RepeatWrapping;
-  normalTexture.wrapT = RepeatWrapping;
-  normalTexture.needsUpdate = true;
+  renderer: WebGLRenderer;
+  scene: Scene;
+  camera: PerspectiveCamera;
+  controls: OrbitControls;
+  bounds: DOMRect;
 
-  const geometry = new SphereGeometry(1, 720, 360);
-  //const geometry = new PlaneGeometry(2, 1, 720, 360);
+  labels: EarthLabel[] = [];
+  areas: EarthArea[] = [];
 
-  const material = new ShaderMaterial({
-    vertexShader,
-    fragmentShader,
-    uniforms: {
-      heightTexture: { value: heightTexture },
-      featuresTexture: { value: featuresTexture },
-      normalTexture: { value: normalTexture },
-      tempTexture: { value: climate.climateTextures.temp },
-      precTexture: { value: climate.climateTextures.prec },
-      iceTexture: { value: climate.climateTextures.ice },
-      sealevel: { value: getSeaLevel(climate, year) },
-      climateYear: { value: getClimateYear(climate, year) },
-      iceYear: { value: getIceYear(climate, year) },
-      visualisation: { value: 0 },
+  earth: Mesh;
+
+  earthMaterial: ShaderMaterial;
+  riverMaterial: ShaderMaterial;
+  arrowMaterial: ShaderMaterial;
+
+  climate!: FetchClimateResult;
+  heightTexture!: Texture;
+  normalTexture!: Texture;
+  starsTexture!: Texture;
+
+  raycaster = new Raycaster();
+  earthSphere = new Sphere(new Vector3(), 1);
+
+  cameraCoordinate: Vector2;
+  targetCoordinate: Vector2 | undefined;
+
+  mouseDown: Vector2 | undefined;
+
+  constructor(
+    wrapper: HTMLDivElement,
+    overlay: HTMLDivElement,
+    year: number,
+    onClick: (coordinate: [number, number], button: number) => void
+  ) {
+    this.wrapper = wrapper;
+    this.overlay = overlay;
+    this.year = year;
+    this.onClick = onClick;
+
+    this.bounds = this.wrapper.getBoundingClientRect();
+
+    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer.outputColorSpace = SRGBColorSpace;
+    this.renderer.setSize(this.bounds.width, this.bounds.height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.wrapper.appendChild(this.renderer.domElement);
+
+    window.addEventListener("resize", () => {
+      this.bounds = this.wrapper.getBoundingClientRect();
+      this.renderer.setSize(this.bounds.width, this.bounds.height);
+      this.camera.aspect = this.bounds.width / this.bounds.height;
+      this.camera.updateProjectionMatrix();
+      this.render();
+    });
+
+    this.scene = new Scene();
+
+    this.camera = new PerspectiveCamera(45, this.bounds.width / this.bounds.height, 0.01, 1000);
+    this.cameraCoordinate = this.getLatLon(new Vector2(0, 0))!;
+
+    this.controls = new OrbitControls(this.camera, this.overlay);
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.1;
+    this.controls.enablePan = false;
+
+    // Load camera position from local storage for development
+    const cameraPosition = localStorage.getItem("camera");
+    if (cameraPosition) {
+      this.camera.position.copy(JSON.parse(cameraPosition));
+    } else {
+      this.camera.position.set(0, 0, 3);
     }
-  });
+    this.controls.update();
 
-  const earth = new Mesh(geometry, material);
-  scene.add(earth);
+    const geometry = generateSphere(1, 720, 360);
+    //const geometry = new PlaneGeometry(2, 1, 720, 360);
 
-  // Add ambient light
-  const ambientLight = new AmbientLight(0xffffff, 0.75);
-  scene.add(ambientLight);
+    this.earthMaterial = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: earthFragmentShader
+    });
 
-  // Add directional light
-  const sun = new DirectionalLight(0xffffff, 3);
-  sun.target = earth;
-  scene.add(sun);
+    this.earth = new Mesh(geometry, this.earthMaterial);
+    this.scene.add(this.earth);
 
-  function onControlChange() {
+    this.riverMaterial = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: riverFragmentShader,
+    });
+
+    this.arrowMaterial = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: arrowFragmentShader,
+      uniforms: {
+        color: { value: new Vector3(229 / 255, 57 / 255, 53 / 255) },
+        transparency: { value: 1 }
+      },
+      depthWrite: true,
+      depthTest: false
+    });
+
+    this.initControls();
+  }
+
+  async load() {
+    const loader = new TextureLoader();
+
+    const result = await Promise.all([
+      loader.loadAsync("height.png"),
+      loader.loadAsync("normal.png"),
+      loader.loadAsync("stars.jpg"),
+      fetchClimate()
+    ]);
+
+    this.heightTexture = result[0];
+    this.normalTexture = result[1];
+    this.starsTexture = result[2];
+    this.climate = result[3];
+
+    setTextureParameters(this.heightTexture);
+    setTextureParameters(this.normalTexture);
+    setTextureParameters(this.starsTexture);
+
+    // Create stars
+
+    this.starsTexture.colorSpace = SRGBColorSpace;
+    this.starsTexture.needsUpdate = true;
+
+    const starsMaterial = new MeshBasicMaterial({
+      map: this.starsTexture,
+      side: 2,
+      depthTest: false,
+      depthWrite: false
+    });
+
+    const stars = new Mesh(generateSphere(1, 100, 50), starsMaterial);
+    stars.scale.setScalar(100);
+    stars.renderOrder = -1;
+    this.scene.add(stars);
+
+    // Create materials
+
+    this.earthMaterial.uniforms = {
+      heightTexture: { value: this.heightTexture },
+      normalTexture: { value: this.normalTexture },
+      tempTexture: { value: this.climate.climateTextures.temp },
+      precTexture: { value: this.climate.climateTextures.prec },
+      iceTexture: { value: this.climate.climateTextures.ice },
+      sealevel: { value: getSeaLevel(this.climate, this.year) },
+      climateYear: { value: getClimateYear(this.climate, this.year) },
+      iceYear: { value: getIceYear(this.climate, this.year) },
+      visualisation: { value: 0 },
+    };
+    this.earthMaterial.needsUpdate = true;
+
+    this.riverMaterial.uniforms = {
+      heightTexture: { value: this.heightTexture },
+      sealevel: { value: getSeaLevel(this.climate, this.year) },
+    };
+
+    this.initRivers();
+
+    this.render();
+  }
+
+  initRivers() {
+    // Create rivers
+    for (const river of this.climate.rivers) {
+      const curve = new CatmullRomCurve3(
+        river.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(ABOVE_TERRAIN))
+      );
+
+      const { geometry } = curveToGeometry(curve, 0.0005, false, 1000);
+
+      const riverMesh = new Mesh(geometry, this.riverMaterial);
+      this.scene.add(riverMesh);
+    }
+  }
+
+  onControlChange() {
     // Store camera position in local storage for development
-    localStorage.setItem("camera", JSON.stringify(camera.position));
+    localStorage.setItem("camera", JSON.stringify(this.camera.position));
 
-    const dx = camera.position.x - earth.position.x;
-    const dz = camera.position.z - earth.position.z;
+    // const dx = this.camera.position.x - this.earth.position.x;
+    // const dz = this.camera.position.z - this.earth.position.z;
 
-    const angleBetweenCameraAndEarth = Math.atan2(dz, dx);
-    const angleBetweenSunAndEarth = angleBetweenCameraAndEarth - 1;
+    // const angleBetweenCameraAndEarth = Math.atan2(dz, dx);
+    // const angleBetweenSunAndEarth = angleBetweenCameraAndEarth - 1;
 
-    sun.position.set(
-      Math.cos(angleBetweenSunAndEarth) * 3,
-      0,
-      Math.sin(angleBetweenSunAndEarth) * 3,
-    );
-    sun.target.position.set(0, 0, 0);
+    // this.sun.position.set(
+    //   Math.cos(angleBetweenSunAndEarth) * 3,
+    //   0,
+    //   Math.sin(angleBetweenSunAndEarth) * 3,
+    // );
+    // this.sun.target.position.set(0, 0, 0);
   }
 
-  function render() {
-    renderer.render(scene, camera);
+  addLabel(text: string, position: Vector3) {
+    const oc = "rgba(0, 0, 0, 0.5)";
+    const os = 1.5;
+    const ob = 1.5;
+
+    const element = document.createElement("div");
+    element.innerHTML = text.replace(/\n/g, "<br>");
+    element.style.position = "absolute";
+    element.style.textAlign = "center";
+    element.style.color = "white";
+    element.style.lineHeight = "1.2";
+    element.style.textShadow = `-${os}px -${os}px ${ob}px ${oc},${os}px -${os}px ${ob}px ${oc}, -${os}px ${os}px ${ob}px ${oc}, ${os}px ${os}px ${ob}px ${oc},-${os}px 0px ${ob}px ${oc},${os}px 0px ${ob}px ${oc},0px -${os}px ${ob}px ${oc},0px  ${os}px ${ob}px ${oc}`;
+    element.style.transform = "translate(-50%, -50%)";
+    element.style.pointerEvents = "none";
+    element.style.userSelect = "none";
+    element.style.touchAction = "none";
+    this.overlay.appendChild(element);
+
+    const label = { element, position, height: text.split("\n").length * 20 };
+    this.labels.push(label);
+
+    return label;
   }
 
-  render();
+  removeLabel(label: EarthLabel) {
+    this.overlay.removeChild(label.element);
+    this.labels.splice(this.labels.indexOf(label), 1);
+  }
 
-  const raycaster = new Raycaster();
-  const earthSphere = new Sphere(new Vector3(), 1);
+  updateLabels() {
+    const cameraNormal = this.camera.position.clone().normalize();
 
-  function getLatLon(position: Vector2): Vector2 | undefined {
+    const calculatedLabels: { x: number, y: number, label: EarthLabel, show: boolean }[] = [];
+
+    // Update labels
+    for (const label of this.labels) {
+      // Check if label is behind the earth
+      const labelNormal = label.position.clone().normalize();
+      const dot = cameraNormal.dot(labelNormal);
+      if (dot < 0) {
+        calculatedLabels.push({ x: 0, y: 0, label, show: false });
+        continue;
+      }
+
+      const position = label.position.clone().project(this.camera);
+      let x = (position.x + 1) / 2 * this.bounds.width;
+      let y = (1 - position.y) / 2 * this.bounds.height;
+
+      calculatedLabels.push({ x, y, label, show: true });
+    }
+
+    for (let i = 0; i < calculatedLabels.length; i++) {
+      if (!calculatedLabels[i].show) continue;
+
+      for (let j = i + 1; j < calculatedLabels.length; j++) {
+        if (!calculatedLabels[j].show) continue;
+
+        const label1 = calculatedLabels[i];
+        const label2 = calculatedLabels[j];
+
+        const dx = label2.x - label1.x;
+        if (Math.abs(dx) > 100) continue;
+
+        const dy = label2.y - label1.y;
+
+        const minDistance = (label1.label.height + label2.label.height) / 2;
+
+        if (dy >= 0 && dy < minDistance) {
+          const shift = (minDistance - dy) / 2;
+          label1.y -= shift;
+          label2.y += shift;
+        } else if (dy <= 0 && dy > -minDistance) {
+          const shift = (minDistance + dy) / 2;
+          label1.y += shift;
+          label2.y -= shift;
+        }
+      }
+    }
+
+    for (const { x, y, label, show } of calculatedLabels) {
+      if (!show) {
+        label.element.style.display = "none";
+        continue;
+      } else {
+        label.element.style.display = "block";
+      }
+
+      label.element.style.left = `${x}px`;
+      label.element.style.top = `${y}px`;
+    }
+  }
+
+  render() {
+    this.updateLabels();
+
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  getLatLon(position: Vector2): Vector2 | undefined {
     // Set the raycaster based on camera and screen position
-    raycaster.setFromCamera(position, camera);
+    this.raycaster.setFromCamera(position, this.camera);
 
     // Check for intersections with the globe
-    const intersection = raycaster.ray.intersectSphere(earthSphere, new Vector3());
+    const intersection = this.raycaster.ray.intersectSphere(this.earthSphere, new Vector3());
     if (intersection) {
       const coordinate = vec3ToCoordinate(intersection);
       return new Vector2(coordinate[0], coordinate[1]);
     }
   }
 
-  let cameraCoordinate = getLatLon(new Vector2(0, 0))!;
-  let targetCoordinate: Vector2 | undefined;
+  animate() {
+    if (!this.targetCoordinate) return;
 
-  function animate() {
-    if (!targetCoordinate) return;
-
-    const current = getLatLon(new Vector2(0, 0))!;
-    const target = targetCoordinate;
+    const current = this.getLatLon(new Vector2(0, 0))!;
+    const target = this.targetCoordinate;
 
     const delta = target.clone().sub(current).multiplyScalar(0.1);
 
-    cameraCoordinate = current.clone().add(delta);
+    this.cameraCoordinate = current.clone().add(delta);
 
     // Update camera position
-    const position = coordinateToVec3(cameraCoordinate.x, cameraCoordinate.y);
-    const cameraDistance = camera.position.length();
-    camera.position.copy(position).multiplyScalar(cameraDistance);
-    camera.lookAt(new Vector3());
+    const position = coordinateToVec3(this.cameraCoordinate.x, this.cameraCoordinate.y);
+    const cameraDistance = this.camera.position.length();
+    this.camera.position.copy(position).multiplyScalar(cameraDistance);
+    this.camera.lookAt(new Vector3());
 
-    render();
+    this.render();
 
     if (delta.length() < 0.01) {
-      targetCoordinate = undefined;
+      this.targetCoordinate = undefined;
       return;
     }
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(() => this.animate());
   }
 
-  controls.addEventListener("change", () => {
-    const coordinate = getLatLon(new Vector2(0, 0))!;
-    cameraCoordinate = coordinate;
-    targetCoordinate = undefined;
-
-    onControlChange();
-    render();
-  });
-
-  let mouseDown: Vector2 | undefined;
-
-  function getNormalisedMouse(event: MouseEvent) {
-    const rect = renderer.domElement.getBoundingClientRect();
+  getNormalisedMouse(event: MouseEvent) {
+    const rect = this.overlay.getBoundingClientRect();
 
     const mouse = new Vector2();
 
@@ -199,298 +415,187 @@ export async function initEarth(
     return mouse;
   }
 
-  renderer.domElement.addEventListener("mousedown", (event) => {
-    mouseDown = getNormalisedMouse(event);
-  });
+  initControls() {
+    this.controls.addEventListener("change", () => {
+      const coordinate = this.getLatLon(new Vector2(0, 0))!;
+      this.cameraCoordinate = coordinate;
+      this.targetCoordinate = undefined;
 
-  renderer.domElement.addEventListener("mouseup", (event) => {
-    const mouse = getNormalisedMouse(event);
+      this.onControlChange();
+      this.render();
+    });
 
-    if (mouseDown && mouse.distanceTo(mouseDown) > 0.01) {
-      mouseDown = undefined;
-      return;
-    }
+    this.overlay.addEventListener("mousedown", (event) => {
+      this.mouseDown = this.getNormalisedMouse(event);
+    });
 
-    const coordinate = getLatLon(mouse);
-    if (coordinate) onClick([coordinate.x, coordinate.y], event.button);
-  });
+    this.overlay.addEventListener("mouseup", (event) => {
+      const mouse = this.getNormalisedMouse(event);
 
-  function addLabel(label: string, position: Vector3) {
-    const lines = label.split("\n");
+      if (this.mouseDown && mouse.distanceTo(this.mouseDown) > 0.01) {
+        this.mouseDown = undefined;
+        return;
+      }
 
-    const canvas = document.createElement("canvas");
-
-    const fontSize = 48;
-
-    const ctx = canvas.getContext("2d")!;
-    ctx.font = fontSize + "px Tahoma";
-    ctx.lineWidth = 4;
-
-    const textSizes = lines.map(line => ctx.measureText(line));
-    canvas.width = Math.max(...textSizes.map(t => t.width)) + 20;
-    canvas.height = fontSize * lines.length + fontSize / 2;
-
-    ctx.font = fontSize + "px Tahoma";
-    ctx.lineWidth = fontSize / 6;
-    ctx.textAlign = "center";
-    ctx.strokeStyle = "black";
-    ctx.fillStyle = "white";
-
-    for (let i = 0; i < lines.length; i++) {
-      ctx.strokeText(lines[i], canvas.width / 2, fontSize * i + fontSize);
-      ctx.fillText(lines[i], canvas.width / 2, fontSize * i + fontSize);
-    }
-
-    const texture = new CanvasTexture(canvas);
-    texture.needsUpdate = true;
-
-    const size = canvas.height / 1400;
-    const ratio = canvas.width / canvas.height;
-
-    const sprite = new Sprite(new SpriteMaterial({ map: texture }));
-    sprite.scale.set(size * ratio, size, 1);
-    sprite.position.copy(position).multiplyScalar(1.05);
-    scene.add(sprite);
-
-    return sprite;
+      const coordinate = this.getLatLon(mouse);
+      if (coordinate) this.onClick([coordinate.x, coordinate.y], event.button);
+    });
   }
 
-  return {
-    clean: () => {
-      wrapper.removeChild(renderer.domElement);
+  clean() {
+    this.wrapper.removeChild(this.renderer.domElement);
 
-      renderer.dispose();
-    },
+    this.renderer.dispose();
+  }
 
-    setYear: (year: number) => {
-      material.uniforms.climateYear.value = getClimateYear(climate, year + 1);
-      material.uniforms.iceYear.value = getIceYear(climate, year);
-      material.uniforms.sealevel.value = getSeaLevel(climate, year);
+  setYear(year: number) {
+    const sealevel = getSeaLevel(this.climate, year);
 
-      render();
-    },
+    this.earthMaterial.uniforms.climateYear.value = getClimateYear(this.climate, year + 1);
+    this.earthMaterial.uniforms.iceYear.value = getIceYear(this.climate, year);
+    this.earthMaterial.uniforms.sealevel.value = sealevel;
 
-    setVisualisation: (visualisation: number) => {
-      material.uniforms.visualisation.value = visualisation;
+    this.riverMaterial.uniforms.sealevel.value = sealevel;
 
-      render();
-    },
+    for (const area of this.areas) {
+      (area.area.material as ShaderMaterial).uniforms.sealevel.value = sealevel;
+    }
 
-    setTarget: (coordinate: [number, number]) => {
-      targetCoordinate = new Vector2(coordinate[0], coordinate[1]);
-      animate();
-    },
+    this.render();
+  }
 
-    // Latitude and longitude are in degrees
-    addMarker: (coordinate: [number, number], text: string) => {
-      const marker = new Mesh(
-        new SphereGeometry(0.01, 32, 32),
-        new MeshBasicMaterial({ color: 0x000000 })
-      );
+  setVisualisation(visualisation: number) {
+    this.earthMaterial.uniforms.visualisation.value = visualisation;
 
-      marker.position.copy(coordinateToVec3(coordinate[0], coordinate[1]));
+    this.render();
+  }
 
-      scene.add(marker);
+  setTarget(coordinate: [number, number]) {
+    this.targetCoordinate = new Vector2(coordinate[0], coordinate[1]);
+    this.animate();
+  }
 
-      const label = addLabel(text, marker.position);
+  // Latitude and longitude are in degrees
+  addMarker(coordinate: [number, number], text: string): EarthMarker {
+    const marker = new Mesh(
+      new SphereGeometry(0.005, 32, 32),
+      new MeshBasicMaterial({ color: 0x000000 })
+    );
 
-      render();
+    marker.position.copy(coordinateToVec3(coordinate[0], coordinate[1]));
 
-      return {
-        marker,
-        label,
-        remove: () => {
-          scene.remove(marker);
-          scene.remove(label);
+    this.scene.add(marker);
 
-          render();
-        }
-      };
-    },
+    const label = this.addLabel(text, marker.position);
 
-    addArrow: (coordinates: [number, number][], text?: string) => {
-      const curve = new CatmullRomCurve3(
-        coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(1.01))
-      );
-      const curveLength = curve.getLength();
-      const curveSegments = Math.round(curveLength * 100);
-      const segmentLength = curveLength / curveSegments;
-      const curvePoints = curve.getPoints(curveSegments);
+    this.render();
 
-      const vertices: number[] = [];
+    return {
+      marker,
+      label,
+      remove: () => {
+        this.scene.remove(marker);
+        this.removeLabel(label);
 
-      let previousTopLeft: Vector3 | undefined;
-      let previousTopRight: Vector3 | undefined;
+        this.render();
+      }
+    };
+  }
 
-      const arrowRadius = 0.01;
-      const arrowHeadRadius = 0.03;
-      const arrowHeadLength = 0.05;
+  addArrow(coordinates: [number, number][], text?: string): EarthArrow {
+    const curve = new CatmullRomCurve3(
+      coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(ABOVE_TERRAIN))
+    );
 
-      for (let i = 0; i < curvePoints.length - 1; i++) {
-        const from = curvePoints[i];
-        const to = curvePoints[i + 1];
-        const next: Vector3 | undefined = curvePoints[i + 2];
+    const { geometry, curvePoints } = curveToGeometry(curve, 0.01, true);
 
-        const forward = (next || to).clone().sub(from).normalize();
-        const up = to.clone().normalize();
-        const right = new Vector3().crossVectors(forward, up).normalize();
+    const arrow = new Mesh(geometry, this.arrowMaterial);
+    arrow.renderOrder = 999;
 
-        const bottomLeft = previousTopLeft || from.clone().sub(right.clone().multiplyScalar(arrowRadius));
-        const bottomRight = previousTopRight || from.clone().add(right.clone().multiplyScalar(arrowRadius));
-        const topLeft = to.clone().sub(right.clone().multiplyScalar(arrowRadius));
-        const topRight = to.clone().add(right.clone().multiplyScalar(arrowRadius));
+    this.scene.add(arrow);
 
-        vertices.push(
-          bottomLeft.x, bottomLeft.y, bottomLeft.z,
-          bottomRight.x, bottomRight.y, bottomRight.z,
-          topRight.x, topRight.y, topRight.z,
+    let label: EarthLabel | undefined;
 
-          bottomLeft.x, bottomLeft.y, bottomLeft.z,
-          topRight.x, topRight.y, topRight.z,
-          topLeft.x, topLeft.y, topLeft.z
+    if (text) {
+      const middle = curvePoints[Math.floor(curvePoints.length / 2)];
+      label = this.addLabel(text, middle);
+    }
+
+    this.render();
+
+    return {
+      arrow,
+      label,
+      remove: () => {
+        this.scene.remove(arrow);
+        if (label) this.removeLabel(label);
+
+        this.render();
+      }
+    };
+  }
+
+  addArea(coordinates: [number, number][], text?: string, showControl?: boolean): EarthArea {
+    const { geometry, averagePoint } = areaToGeometry(coordinates);
+
+    const color = getAreaColor(text || "Area");
+    const material = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: areaFragmentShader,
+      uniforms: {
+        color: { value: color },
+        transparency: { value: 0.5 },
+        heightTexture: { value: this.heightTexture },
+        sealevel: { value: getSeaLevel(this.climate, this.year) },
+      },
+      transparent: true,
+      depthWrite: false,
+      depthTest: false
+    });
+
+    const areaMesh = new Mesh(geometry, material);
+    areaMesh.renderOrder = 999;
+
+    this.scene.add(areaMesh);
+
+    let label: EarthLabel | undefined;
+    if (text) {
+      label = this.addLabel(text, averagePoint);
+    }
+
+    // Show control points
+    let points: Mesh[] | undefined;
+    if (showControl) {
+      points = coordinates.map(([latitude, longitude]) => {
+        const point = new Mesh(
+          new SphereGeometry(0.001, 32, 32),
+          new MeshBasicMaterial({ color: 0x000000, depthTest: false })
         );
 
-        // Arrow head
-        if (i === curvePoints.length - 2) {
-          // Remove the last part that overlaps
-          const overlappingSegments = Math.floor(arrowHeadLength / segmentLength) - 2;
-          vertices.splice(-18 * overlappingSegments, 18 * overlappingSegments);
+        point.position.copy(coordinateToVec3(latitude, longitude).multiplyScalar(ABOVE_TERRAIN));
+        this.scene.add(point);
 
-          const headLength = forward.clone().multiplyScalar(arrowHeadLength);
-          const headBase = to.clone().sub(headLength);
-          const headSide = right.clone().multiplyScalar(arrowHeadRadius);
-
-          const headTop = to;
-          const headLeft = headBase.clone().sub(headSide);
-          const headRight = headBase.clone().add(headSide);
-
-          vertices.push(
-            headLeft.x, headLeft.y, headLeft.z,
-            headRight.x, headRight.y, headRight.z,
-            headTop.x, headTop.y, headTop.z
-          );
-        }
-
-        previousTopLeft = topLeft;
-        previousTopRight = topRight;
-      }
-
-      const geometry = new BufferGeometry();
-      geometry.setAttribute("position", new BufferAttribute(new Float32Array(vertices), 3));
-      geometry.computeVertexNormals();
-
-      const material = new MeshStandardMaterial({ color: 0xff0000 });
-      const arrow = new Mesh(geometry, material);
-      scene.add(arrow);
-
-      let label: Sprite | undefined;
-
-      if (text) {
-        const middle = curvePoints[Math.floor(curvePoints.length / 2)];
-        label = addLabel(text, middle);
-      }
-
-      render();
-
-      return {
-        arrow,
-        label,
-        remove: () => {
-          scene.remove(arrow);
-          if (label) scene.remove(label);
-
-          render();
-        }
-      };
-    },
-
-    addArea: (coordinates: [number, number][], text?: string) => {
-      const points = coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(1.01));
-
-      const curve = new CatmullRomCurve3(points, true);
-      const curveLength = curve.getLength();
-      const curveSegments = Math.round(curveLength * 100);
-      const curvePoints = curve.getPoints(curveSegments);
-
-      const averagePoint = new Vector3();
-      for (const point of points) {
-        averagePoint.add(point);
-      }
-      averagePoint.divideScalar(points.length);
-      const normal = averagePoint.clone().normalize();
-
-      const project2D = (point: Vector3): Vector2 => {
-        const projected = point.clone().sub(averagePoint).projectOnPlane(normal);
-        return new Vector2(projected.x, projected.y);
-      };
-
-      const project3D = (point: Vector2): Vector3 => {
-        const projected = new Vector3(point.x, point.y, 0);
-        return projected.add(averagePoint);
-      };
-
-      const projectedPoints = curvePoints.map(project2D);
-
-      const indices = Earcut.triangulate(projectedPoints.flatMap(p => [p.x, p.y]), [], 2);
-      const triangles: number[] = indices.flatMap(i => [curvePoints[i].x, curvePoints[i].y, curvePoints[i].z]);
-
-      for (let i = 0; i < triangles.length; i += 9) {
-        const triangleNormal = new Vector3(
-          triangles[i + 3] - triangles[i],
-          triangles[i + 4] - triangles[i + 1],
-          triangles[i + 5] - triangles[i + 2]
-        ).cross(new Vector3(
-          triangles[i + 6] - triangles[i],
-          triangles[i + 7] - triangles[i + 1],
-          triangles[i + 8] - triangles[i + 2]
-        )).normalize();
-
-        // Check if normal is pointing in the right direction
-        if (triangleNormal.dot(normal) < 0) {
-          // Reverse the order of the vertices
-          let temp = triangles[i + 3];
-          triangles[i + 3] = triangles[i + 6];
-          triangles[i + 6] = temp;
-
-          temp = triangles[i + 4];
-          triangles[i + 4] = triangles[i + 7];
-          triangles[i + 7] = temp;
-
-          temp = triangles[i + 5];
-          triangles[i + 5] = triangles[i + 8];
-          triangles[i + 8] = temp;
-        }
-      }
-
-      const geometry = new BufferGeometry();
-      geometry.setAttribute("position", new BufferAttribute(new Float32Array(triangles), 3));
-      geometry.computeVertexNormals();
-
-      const material = new MeshStandardMaterial({ color: 0xff0000, opacity: 0.5, transparent: true });
-      const area = new Mesh(geometry, material);
-      scene.add(area);
-
-      let label: Sprite | undefined;
-
-      if (text) {
-        const middle = curvePoints[Math.floor(curvePoints.length / 2)];
-        label = addLabel(text, middle);
-      }
-
-      render();
-
-      return {
-        area,
-        label,
-        remove: () => {
-          scene.remove(area);
-          if (label) scene.remove(label);
-
-          render();
-        }
-      };
+        return point;
+      });
     }
-  };
-}
 
-export type Earth = Awaited<ReturnType<typeof initEarth>>;
+    this.render();
+
+    const area = {
+      area: areaMesh,
+      label,
+      points,
+      remove: () => {
+        this.scene.remove(areaMesh);
+        if (label) this.removeLabel(label);
+        if (points) points.forEach(point => this.scene.remove(point));
+
+        this.render();
+      }
+    };
+
+    this.areas.push(area);
+
+    return area;
+  }
+}

@@ -30,7 +30,7 @@ export interface HistoricalEvent extends Historical {
   icon: Icon;
   time: number;
   eventType: HistoricalEventType;
-  coordinates: [number, number][][];
+  coordinates: ([number, number] | HistoricalLocation)[][];
 }
 
 export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): HistoricalEvent[] {
@@ -41,7 +41,7 @@ export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): Hist
 
     const [name, time, icon, type] = lines.slice(0, 4);
 
-    const coordinates: [number, number][][] = [[]];
+    const coordinates: ([number, number] | HistoricalLocation)[][] = [[]];
 
     for (let i = 4; i < lines.length; i++) {
       const line = lines[i];
@@ -53,7 +53,7 @@ export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): Hist
 
       const startsWithNumber = line.match(/^[\d-]/);
 
-      let coordinate: [number, number];
+      let coordinate: [number, number] | HistoricalLocation;
 
       if (startsWithNumber) {
         coordinate = line.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c)) as [number, number];
@@ -62,7 +62,7 @@ export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): Hist
         if (!location) {
           throw new Error(`Location not found: ${line}`);
         }
-        coordinate = getCoordinateCenter(location.coordinates);
+        coordinate = location;
       }
 
       coordinates[coordinates.length - 1].push(coordinate);

@@ -20,16 +20,27 @@ export interface HistoricalLocation extends Historical {
 export function loadLocations(): HistoricalLocation[] {
   const locationParts = LocationsText.replace(/\r\n/g, "\n").split("\n\n");
 
-  const locations: HistoricalLocation[] = locationParts.map((locationPart) => {
+  const locations: HistoricalLocation[] = [];
+
+  for (const locationPart of locationParts) {
     const lines = locationPart.split("\n");
 
     const name = lines[0];
     const period = lines[1];
     const [start, end] = period.split(",");
 
-    const coordinates = lines.slice(2).map(line =>
-      line.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c)) as [number, number]
-    );
+    const coordinateLines = lines.slice(2);
+
+    let coordinates: [number, number][];
+
+    if (coordinateLines.length === 1 && !coordinateLines[0].includes(",")) {
+      const locationName = coordinateLines[0];
+      coordinates = locations.find(l => l.name === locationName)?.coordinates || [];
+    } else {
+      coordinates = coordinateLines.map(line =>
+        line.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c)) as [number, number]
+      );
+    }
 
     const location: HistoricalLocation = {
       name,
@@ -38,8 +49,8 @@ export function loadLocations(): HistoricalLocation[] {
       coordinates: coordinates
     };
 
-    return location;
-  });
+    locations.push(location);
+  }
 
   return locations;
 }

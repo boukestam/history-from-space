@@ -1,4 +1,4 @@
-import { Earth } from "../earth";
+import { Earth, EarthItem } from "../earth";
 import { HistoricalEvent, loadEvents } from "./events";
 import { HistoricalLocation, loadLocations } from "./locations";
 import { Timeline } from "../timeline";
@@ -11,7 +11,27 @@ export interface Historical {
   name: string;
   type: HistoricalType;
   period: [number, number];
-  removable?: { remove: () => void };
+  removable?: EarthItem;
+}
+
+function getEventCenter(event: HistoricalEvent) {
+  const coordinates: [number, number][] = [];
+
+  for (const c of event.coordinates.flat()) {
+    if (Array.isArray(c)) {
+      coordinates.push(c);
+    } else {
+      coordinates.push(...c.coordinates);
+    }
+  }
+
+  return getCoordinateCenter(coordinates);
+}
+
+function getEventCoordinates(event: HistoricalEvent): [number, number][][] {
+  return event.coordinates.map(coordinates =>
+    coordinates.map(c => Array.isArray(c) ? c : getCoordinateCenter(c.coordinates))
+  );
 }
 
 export async function initHistory(earth: Earth, timeline: Timeline, initialYear: number) {
@@ -47,10 +67,10 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
           const event = item as HistoricalEvent;
 
           if (event.eventType === 'arrow') {
-            const arrows = event.coordinates.map((coordinates, i) => earth.addArrow(coordinates, i === 0 ? event.name : ""));
+            const arrows = getEventCoordinates(event).map((coordinates, i) => earth.addArrow(coordinates, i === 0 ? event.name : ""));
             event.removable = { remove: () => arrows.forEach(arrow => arrow.remove()) };
           } else if (event.eventType === 'marker') {
-            event.removable = earth.addMarker(event.coordinates[0][0], event.name);
+            event.removable = earth.addMarker(getEventCenter(event), event.name);
           }
         }
       }
@@ -72,7 +92,7 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
 
       if (previousEvent) {
         timeline.setTarget(previousEvent.time);
-        earth.setTarget(getCoordinateCenter(previousEvent.coordinates[0]));
+        earth.setTarget(getEventCenter(previousEvent));
       }
     },
 
@@ -84,7 +104,7 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
 
       if (nextEvent) {
         timeline.setTarget(nextEvent.time);
-        earth.setTarget(getCoordinateCenter(nextEvent.coordinates[0]));
+        earth.setTarget(getEventCenter(nextEvent));
       }
     }
   };

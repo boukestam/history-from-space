@@ -1,5 +1,4 @@
-import { DataArrayTexture } from "three/src/textures/DataArrayTexture.js";
-import { LinearFilter, RepeatWrapping } from "three/src/Three.WebGPU.js";
+import { LinearFilter, RepeatWrapping, DataArrayTexture } from "three";
 
 async function fetchFloats(url: string): Promise<Float32Array> {
   const response = await fetch(url);
@@ -24,10 +23,11 @@ function createTexture(data: Uint8Array, width: number, height: number, channels
 }
 
 export async function fetchClimate() {
-  const [climateBytes, sealevelFloats, iceBytes] = await Promise.all([
+  const [climateBytes, sealevelFloats, iceBytes, riverBytes] = await Promise.all([
     fetchBytes("climate.bin"),
     fetchFloats("sealevels.bin"),
-    fetchBytes("ice.bin")
+    fetchBytes("ice.bin"),
+    fetchBytes("rivers.bin")
   ]);
 
   const years = [];
@@ -113,6 +113,28 @@ export async function fetchClimate() {
 
   const iceTexture = createTexture(iceData, iceWidth, iceHeight, iceYears);
 
+  // Load rivers
+  const rivers = [];
+  const riverData = new DataView(riverBytes.buffer);
+
+  for (let i = 0; i < riverBytes.length;) {
+    const length = riverData.getUint16(i, true);
+    i += 2;
+
+    const river = [];
+
+    for (let j = 0; j < length; j++) {
+      const lon = riverData.getFloat32(i, true);
+      i += 4;
+      const lat = riverData.getFloat32(i, true);
+      i += 4;
+
+      river.push([lat, lon]);
+    }
+
+    rivers.push(river);
+  }
+
   return {
     years: years,
     climateTextures: {
@@ -120,7 +142,8 @@ export async function fetchClimate() {
       prec: precTexture,
       ice: iceTexture
     },
-    sealevels: sealevelFloats
+    sealevels: sealevelFloats,
+    rivers: rivers
   };
 }
 

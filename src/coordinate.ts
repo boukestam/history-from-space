@@ -1,4 +1,4 @@
-import { Vector3 } from "three/src/math/Vector3.js";
+import { Vector3 } from "three";
 
 export function coordinateToVec3(latitude: number, longitude: number) {
   const latitudeRad = latitude * Math.PI / 180;
