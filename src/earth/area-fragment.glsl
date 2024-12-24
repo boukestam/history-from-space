@@ -1,4 +1,5 @@
 uniform sampler2D heightTexture;
+uniform sampler2D lakeMaskTexture;
 uniform float sealevel;
 
 uniform vec3 color;
@@ -21,7 +22,11 @@ void main() {
     height = (heightIntensity - 230.0) / 25.0 * 5724.0;
   }
 
-  if (height < sealevel) {
+  vec4 lakeMaskColor = texture2D(lakeMaskTexture, vUv);
+  bool noLake = lakeMaskColor.r > 0.5;
+  bool yesLake = lakeMaskColor.g > 0.5;
+
+  if ((height < sealevel && !noLake) || (height < 0.0 && yesLake)) {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
   } else {
     gl_FragColor = vec4(color, transparency);

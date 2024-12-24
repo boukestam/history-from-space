@@ -1,3 +1,5 @@
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import { polygon, point } from "@turf/helpers";
 import { Vector3 } from "three";
 
 export function coordinateToVec3(latitude: number, longitude: number) {
@@ -22,4 +24,9 @@ export function getCoordinateCenter(coordinates: [number, number][]): [number, n
   const vec3s = coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude));
   const center = vec3s.reduce((a, b) => a.add(b), new Vector3()).normalize();
   return vec3ToCoordinate(center);
+}
+
+export function isCoordinateInArea(coordinate: [number, number], area: [number, number][]) {
+  const poly = polygon([[...area, area[0]].map(([latitude, longitude]) => [longitude, latitude])]);
+  return booleanPointInPolygon(point([coordinate[1], coordinate[0]]), poly);
 }

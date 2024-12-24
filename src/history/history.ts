@@ -1,4 +1,4 @@
-import { Earth, EarthItem } from "../earth";
+import { Earth, EarthItem } from "../earth/earth";
 import { HistoricalEvent, loadEvents } from "./events";
 import { HistoricalLocation, loadLocations } from "./locations";
 import { Timeline } from "../timeline";
@@ -45,6 +45,10 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     timeline.addEvent(event);
   }
 
+  for (const location of locations) {
+    timeline.addPeriod(location);
+  }
+
   function updateMap(year: number) {
     for (const item of items) {
       if (item.period[0] > year || item.period[1] < year) {
@@ -59,18 +63,22 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
           const location = item as HistoricalLocation;
 
           if (location.coordinates.length === 1) {
-            location.removable = earth.addMarker(location.coordinates[0], location.name);
+            location.removable = earth.addMarker(location.coordinates[0], location.name, location.info);
           } else {
-            location.removable = earth.addArea(location.coordinates, location.name);
+            location.removable = earth.addArea(location.coordinates, location.name, location.info);
           }
         } else if (item.type === 'event') {
           const event = item as HistoricalEvent;
 
           if (event.eventType === 'arrow') {
-            const arrows = getEventCoordinates(event).map((coordinates, i) => earth.addArrow(coordinates, i === 0 ? event.name : ""));
+            const arrows = getEventCoordinates(event).map((coordinates, i) => earth.addArrow(
+              coordinates,
+              i === 0 ? event.name : "",
+              i === 0 ? event.info : undefined
+            ));
             event.removable = { remove: () => arrows.forEach(arrow => arrow.remove()) };
           } else if (event.eventType === 'marker') {
-            event.removable = earth.addMarker(getEventCenter(event), event.name);
+            event.removable = earth.addMarker(getEventCenter(event), event.name, event.info);
           }
         }
       }
@@ -85,7 +93,7 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     },
 
     skipToPreviousEvent: () => {
-      const currentYear = timeline.year();
+      const currentYear = timeline.getYear();
       const previousEvent = events.slice()
         .sort((a, b) => b.time - a.time)
         .find(event => event.time < currentYear);
@@ -97,7 +105,7 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
     },
 
     skipToNextEvent: () => {
-      const currentYear = timeline.year();
+      const currentYear = timeline.getYear();
       const nextEvent = events.slice()
         .sort((a, b) => a.time - b.time)
         .find(event => event.time > currentYear);

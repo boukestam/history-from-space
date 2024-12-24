@@ -1,377 +1,448 @@
+import { getAreaColor } from "./earth/earth";
 import { HistoricalEvent } from "./history/events";
+import { HistoricalLocation } from "./history/locations";
 
 export const CURRENT_YEAR = new Date().getFullYear();
 export const MIN_YEAR = -100000;
 export const MAX_YEAR = CURRENT_YEAR;
 
 const ZOOM_SPEED = 0.1;
+const LOG_SKEW = 0.001;
 
 export function toKYear(year: number) {
   return Math.abs((year - CURRENT_YEAR) / 1000);
 }
 
-function yearToString(year: number, step: number) {
-  let yearString;
+export class Timeline {
 
-  if (year > -10000) {
-    yearString = Math.abs(year).toFixed(0);
-  } else if (year > -1000000) {
-    let decimals = Math.min(3, Math.max(0, 4 - Math.log10(step)));
-    yearString = (year / -1000).toFixed(decimals) + "K";
-  } else {
-    let decimals = Math.min(3, Math.max(0, 7 - Math.log10(step)));
-    yearString = (year / -1000000).toFixed(decimals) + "M";
-  }
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  size: { width: number, height: number };
 
-  return yearString + " " + (year < 0 ? "BC" : "AD");
-}
+  private year: number;
+  private minYear: number;
+  private maxYear: number;
+  private target: number = -1;
 
-function yearToX(year: number, minYear: number, maxYear: number, width: number) {
-  return Math.round((year - minYear) / (maxYear - minYear) * width);
-}
+  onYearChange: (year: number) => void;
 
-function xToYear(x: number, minYear: number, maxYear: number, width: number) {
-  return x / width * (maxYear - minYear) + minYear;
-}
-
-function getStepSize(minYear: number, maxYear: number) {
-  const range = maxYear - minYear;
-
-  if (range < 100) return 10;
-  if (range < 500) return 50;
-  if (range < 1000) return 100;
-  if (range < 5000) return 500;
-  if (range < 10000) return 1000;
-  if (range < 50000) return 5000;
-  if (range < 100000) return 10000;
-  if (range < 500000) return 50000;
-  if (range < 1000000) return 100000;
-  if (range < 5000000) return 500000;
-
-  return 1000000;
-}
-
-function resize(canvas: HTMLCanvasElement) {
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * window.devicePixelRatio;
-  canvas.height = rect.height * window.devicePixelRatio;
-  return { width: rect.width, height: rect.height };
-}
-
-export async function initTimeline(
-  canvas: HTMLCanvasElement,
-  onYearChange: (year: number) => void
-) {
-  let size = resize(canvas);
-
-  window.addEventListener('resize', () => {
-    size = resize(canvas);
-    render();
-  });
-
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
-  let year = 0;
-  let minYear = MIN_YEAR;
-  let maxYear = MAX_YEAR;
-
-  const data = localStorage.getItem('timeline');
-  if (data) {
-    const { min, max, year: y } = JSON.parse(data);
-    minYear = min;
-    maxYear = max;
-    year = y;
-  }
-
-  ctx.textAlign = 'center';
-  ctx.font = '12px Tahoma';
-
-  const markers: {
+  events: {
     event: HistoricalEvent;
     image: HTMLImageElement;
   }[] = [];
 
-  function render() {
-    ctx.save();
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  periods: {
+    location: HistoricalLocation;
+    color: string;
+  }[] = [];
 
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, size.width, size.height);
+  constructor(
+    canvas: HTMLCanvasElement,
+    onYearChange: (year: number) => void
+  ) {
+    this.canvas = canvas;
+    this.onYearChange = onYearChange;
 
-    const step = getStepSize(minYear, maxYear);
-    const start = Math.floor(minYear / step) * step;
-    const end = Math.ceil(maxYear / step) * step;
+    this.size = this.resize(canvas);
+
+    window.addEventListener('resize', () => {
+      this.size = this.resize(canvas);
+      this.render();
+    });
+
+    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    this.year = 0;
+    this.minYear = MIN_YEAR;
+    this.maxYear = MAX_YEAR;
+
+    const data = localStorage.getItem('timeline');
+    if (data) {
+      const { min, max, year: y } = JSON.parse(data);
+      this.minYear = min;
+      this.maxYear = max;
+      this.year = y;
+    }
+
+    this.ctx.textAlign = 'center';
+    this.ctx.font = '12px Tahoma';
+
+    this.initControls();
+
+    this.render();
+  }
+
+  // Apply a logarithmic transformation to the year
+  logTransformYear(year: number) {
+    const normalizedYear = this.maxYear - year;
+    return Math.log10(normalizedYear * LOG_SKEW + 1);
+  }
+
+  // Inverse of the logarithmic transformation
+  logInverseTransform(value: number) {
+    return this.maxYear - ((Math.pow(10, value) - 1) / LOG_SKEW);
+  }
+
+  yearToX(year: number, minYear: number, maxYear: number, width: number) {
+    const logMin = this.logTransformYear(minYear);
+    const logMax = this.logTransformYear(maxYear);
+    const logYear = this.logTransformYear(year);
+
+    return Math.round(((logYear - logMin) / (logMax - logMin)) * width);
+  }
+
+  xToYear(x: number, minYear: number, maxYear: number, width: number) {
+    const logMin = this.logTransformYear(minYear);
+    const logMax = this.logTransformYear(maxYear);
+
+    const logYear = x / width * (logMax - logMin) + logMin;
+    return this.logInverseTransform(logYear);
+  }
+
+  yearToString(year: number, step: number) {
+    let yearString;
+
+    if (year > -10000) {
+      yearString = Math.abs(year).toFixed(0);
+    } else if (year > -1000000) {
+      let decimals = Math.min(3, Math.max(0, 4 - Math.log10(step)));
+      yearString = (year / -1000).toFixed(decimals) + "K";
+    } else {
+      let decimals = Math.min(3, Math.max(0, 7 - Math.log10(step)));
+      yearString = (year / -1000000).toFixed(decimals) + "M";
+    }
+
+    return yearString + " " + (year < 0 ? "BC" : "AD");
+  }
+
+  getStepSize(minYear: number, maxYear: number) {
+    const range = maxYear - minYear;
+
+    if (range < 100) return 10;
+    if (range < 500) return 50;
+    if (range < 1000) return 100;
+    if (range < 5000) return 500;
+    if (range < 10000) return 1000;
+    if (range < 50000) return 5000;
+    if (range < 100000) return 10000;
+    if (range < 500000) return 50000;
+    if (range < 1000000) return 100000;
+    if (range < 5000000) return 500000;
+
+    return 1000000;
+  }
+
+  resize(canvas: HTMLCanvasElement) {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    return { width: rect.width, height: rect.height };
+  }
+
+  render() {
+    this.ctx.save();
+    this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+    this.ctx.clearRect(0, 0, this.size.width, this.size.height);
+
+    const step = this.getStepSize(this.minYear, this.maxYear);
+    const start = Math.floor(this.minYear / step) * step;
+    const end = Math.ceil(this.maxYear / step) * step;
 
     let steps = [];
 
     for (let i = start; i <= end; i += step) {
-      const x = yearToX(i, minYear, maxYear, size.width);
+      const x = this.yearToX(i, this.minYear, this.maxYear, this.size.width);
       steps.push(x);
 
-      ctx.fillStyle = 'lightgray';
-      ctx.fillRect(x, 20, 1, 40);
-      ctx.fillText(yearToString(i, step), x, 13);
+      this.ctx.fillStyle = 'lightgray';
+      this.ctx.fillRect(x, 20, 1, 40);
+      this.ctx.fillText(this.yearToString(i, step), x, 13);
 
       if (i <= end - step) {
         // Draw 4 substeps
         const substep = step / 5;
         for (let j = 1; j < 5; j++) {
-          const x = yearToX(i + substep * j, minYear, maxYear, size.width);
-          ctx.fillStyle = 'gray';
-          ctx.fillRect(x, 20, 1, 20);
+          const x = this.yearToX(i + substep * j, this.minYear, this.maxYear, this.size.width);
+          this.ctx.fillStyle = 'gray';
+          this.ctx.fillRect(x, 20, 1, 20);
         }
       }
     }
 
-    const x = yearToX(year, minYear, maxYear, size.width);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x - 1, 20, 3, 40);
-    ctx.fillText(yearToString(year, 1), x, 13);
+    const renderedPeriods = [];
 
-    for (const marker of markers) {
-      const x = yearToX(marker.event.time, minYear, maxYear, size.width);
+    for (const period of this.periods) {
+      if (period.location.period[1] < this.minYear || period.location.period[0] > this.maxYear) continue;
+
+      const x1 = this.yearToX(period.location.period[0], this.minYear, this.maxYear, this.size.width);
+      const x2 = this.yearToX(period.location.period[1], this.minYear, this.maxYear, this.size.width);
+
+      // Check for overlapping periods
+      const overlap = renderedPeriods.filter(p => p.x1 < x2 && p.x2 > x1).length;
+
+      const height = 4;
+      const y = 20 + overlap * height;
+
+      this.ctx.fillStyle = period.color;
+      this.ctx.fillRect(x1, y, x2 - x1, height);
+
+      renderedPeriods.push({ x1, x2 });
+    }
+
+    for (const marker of this.events) {
+      const x = this.yearToX(marker.event.time, this.minYear, this.maxYear, this.size.width);
 
       const markerRadius = 12;
       const markerImageSize = 16;
       const markerY = 30;
 
-      ctx.fillStyle = marker.event.icon.color;
-      ctx.beginPath();
-      ctx.arc(x, markerY, markerRadius, 0, Math.PI * 2);
-      ctx.fill();
+      this.ctx.fillStyle = marker.event.icon.color;
+      this.ctx.beginPath();
+      this.ctx.arc(x, markerY, markerRadius, 0, Math.PI * 2);
+      this.ctx.fill();
 
-      ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
+      this.ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
     }
 
-    ctx.restore();
+    const x = this.yearToX(this.year, this.minYear, this.maxYear, this.size.width);
+    this.ctx.fillStyle = 'white';
+    this.ctx.fillRect(x - 1, 20, 3, 40);
+    this.ctx.fillText(this.yearToString(this.year, 1), x, 13);
+
+    this.ctx.restore();
   }
 
-  function saveView() {
+  saveView() {
     localStorage.setItem('timeline', JSON.stringify({
-      min: minYear,
-      max: maxYear,
-      year: year
+      min: this.minYear,
+      max: this.maxYear,
+      year: this.year
     }));
   }
 
-  function onClick(clientX: number) {
-    const rect = canvas.getBoundingClientRect();
+  onClick(clientX: number) {
+    const rect = this.canvas.getBoundingClientRect();
     const x = clientX - rect.left;
 
-    let newYear = xToYear(x, minYear, maxYear, size.width);
+    let newYear = this.xToYear(x, this.minYear, this.maxYear, this.size.width);
     newYear = Math.max(MIN_YEAR, Math.min(MAX_YEAR, newYear));
 
-    onYearChange(newYear);
+    this.onYearChange(newYear);
 
-    year = newYear;
+    this.year = newYear;
 
-    saveView();
-    render();
+    this.saveView();
+    this.render();
   }
 
-  function onZoom(clientX: number, delta: number, zoomSpeed = ZOOM_SPEED) {
-    const x = clientX - canvas.getBoundingClientRect().left;
+  onZoom(clientX: number, delta: number, zoomSpeed = ZOOM_SPEED) {
+    const x = clientX - this.canvas.getBoundingClientRect().left;
 
     // Zoom in/out from the cursor
     const zoom = delta > 0 ? (1 + zoomSpeed) : 1 / (1 + zoomSpeed);
-    const cursorYear = xToYear(x, minYear, maxYear, size.width);
+    const cursorYear = this.xToYear(x, this.minYear, this.maxYear, this.size.width);
 
-    minYear = cursorYear - (cursorYear - minYear) * zoom;
-    maxYear = cursorYear + (maxYear - cursorYear) * zoom;
+    this.minYear = cursorYear - (cursorYear - this.minYear) * zoom;
+    this.maxYear = cursorYear + (this.maxYear - cursorYear) * zoom;
 
-    if (minYear < MIN_YEAR) {
-      minYear = MIN_YEAR;
-      maxYear = Math.min(minYear + (maxYear - minYear) * zoom, MAX_YEAR);
+    if (this.minYear < MIN_YEAR) {
+      this.minYear = MIN_YEAR;
+      this.maxYear = Math.min(this.minYear + (this.maxYear - this.minYear) * zoom, MAX_YEAR);
     }
 
-    if (maxYear > MAX_YEAR) {
-      maxYear = MAX_YEAR;
-      minYear = Math.max(maxYear - (maxYear - minYear) * zoom, MIN_YEAR);
+    if (this.maxYear > MAX_YEAR) {
+      this.maxYear = MAX_YEAR;
+      this.minYear = Math.max(this.maxYear - (this.maxYear - this.minYear) * zoom, MIN_YEAR);
     }
 
-    saveView();
-    render();
+    this.saveView();
+    this.render();
   }
 
-  function clampPan(range: number) {
-    if (minYear < MIN_YEAR) {
-      minYear = MIN_YEAR;
-      maxYear = minYear + range;
+  clampPan(range: number) {
+    if (this.minYear < MIN_YEAR) {
+      this.minYear = MIN_YEAR;
+      this.maxYear = this.minYear + range;
     }
 
-    if (maxYear > MAX_YEAR) {
-      maxYear = MAX_YEAR;
-      minYear = maxYear - range;
+    if (this.maxYear > MAX_YEAR) {
+      this.maxYear = MAX_YEAR;
+      this.minYear = this.maxYear - range;
     }
   }
 
-  function onPan(delta: number) {
-    const range = maxYear - minYear;
+  onPan(delta: number) {
+    const range = this.maxYear - this.minYear;
 
-    const stepSize = range / size.width;
+    const stepSize = range / this.size.width;
     const deltaYear = -delta * stepSize;
 
-    minYear += deltaYear;
-    maxYear += deltaYear;
+    this.minYear += deltaYear;
+    this.maxYear += deltaYear;
 
-    clampPan(range);
+    this.clampPan(range);
 
-    saveView();
-    render();
+    this.saveView();
+    this.render();
   }
 
-  let moving = false;
-  let panning = false;
+  initControls() {
+    let moving = false;
+    let panning = false;
 
-  // Mouse events
+    // Mouse events
 
-  canvas.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {
-      onClick(e.clientX);
-      moving = true;
-    } else if (e.button === 2) {
-      panning = true;
-    }
-  });
+    this.canvas.addEventListener('mousedown', (e) => {
+      if (e.button === 0) {
+        this.onClick(e.clientX);
+        moving = true;
+      } else if (e.button === 2) {
+        panning = true;
+      }
+    });
 
-  document.addEventListener('mousemove', (e) => {
-    if (moving) onClick(e.clientX);
-    if (panning) onPan(e.movementX);
-  });
+    document.addEventListener('mousemove', (e) => {
+      if (moving) this.onClick(e.clientX);
+      if (panning) this.onPan(e.movementX);
+    });
 
-  document.addEventListener('mouseup', () => {
-    moving = false;
-    panning = false;
-  });
-
-  canvas.addEventListener('wheel', (e) => {
-    onZoom(e.clientX, e.deltaY > 0 ? 1 : -1);
-  });
-
-  // Touch events
-
-  let scaling = false;
-  let lastTouchDistance = 0;
-  let lastTouchCenterX = 0;
-
-  function getTouchDistance(e: TouchEvent) {
-    const touch1 = e.touches[0];
-    const touch2 = e.touches[1];
-
-    return Math.hypot(
-      touch1.clientX - touch2.clientX,
-      touch1.clientY - touch2.clientY
-    );
-  }
-
-  function getTouchCenterX(e: TouchEvent) {
-    return (e.touches[0].clientX + e.touches[1].clientX) / 2;
-  }
-
-  canvas.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-      onClick(e.touches[0].clientX);
-      moving = true;
-      scaling = false;
-    } else if (e.touches.length === 2) {
-      lastTouchDistance = getTouchDistance(e);
-      lastTouchCenterX = getTouchCenterX(e);
-      scaling = true;
+    document.addEventListener('mouseup', () => {
       moving = false;
+      panning = false;
+    });
+
+    this.canvas.addEventListener('wheel', (e) => {
+      this.onZoom(e.clientX, e.deltaY > 0 ? 1 : -1);
+    });
+
+    // Touch events
+
+    let scaling = false;
+    let lastTouchDistance = 0;
+    let lastTouchCenterX = 0;
+
+    function getTouchDistance(e: TouchEvent) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+
+      return Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
     }
-  });
 
-  document.addEventListener('touchmove', (e) => {
-    if (moving) onClick(e.touches[0].clientX);
-
-    if (scaling && e.touches.length === 2) {
-      const touchDistance = getTouchDistance(e);
-      const touchCenterX = getTouchCenterX(e);
-
-      onPan(touchCenterX - lastTouchCenterX);
-      onZoom(touchCenterX, (touchDistance > lastTouchDistance ? -1 : 1), 0.05);
-
-      lastTouchDistance = touchDistance;
-      lastTouchCenterX = touchCenterX;
+    function getTouchCenterX(e: TouchEvent) {
+      return (e.touches[0].clientX + e.touches[1].clientX) / 2;
     }
-  });
 
-  document.addEventListener('touchend', () => {
-    moving = false;
-    scaling = false;
-  });
+    this.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        this.onClick(e.touches[0].clientX);
+        moving = true;
+        scaling = false;
+      } else if (e.touches.length === 2) {
+        lastTouchDistance = getTouchDistance(e);
+        lastTouchCenterX = getTouchCenterX(e);
+        scaling = true;
+        moving = false;
+      }
+    });
 
-  canvas.addEventListener('touchcancel', () => {
-    moving = false;
-    scaling = false;
-  });
+    document.addEventListener('touchmove', (e) => {
+      if (moving) this.onClick(e.touches[0].clientX);
 
-  render();
+      if (scaling && e.touches.length === 2) {
+        const touchDistance = getTouchDistance(e);
+        const touchCenterX = getTouchCenterX(e);
 
-  let target = -1;
+        this.onPan(touchCenterX - lastTouchCenterX);
+        this.onZoom(touchCenterX, (touchDistance > lastTouchDistance ? -1 : 1), 0.05);
 
-  function update() {
-    if (target === -1) return;
+        lastTouchDistance = touchDistance;
+        lastTouchCenterX = touchCenterX;
+      }
+    });
 
-    const delta = target - year;
+    document.addEventListener('touchend', () => {
+      moving = false;
+      scaling = false;
+    });
+
+    this.canvas.addEventListener('touchcancel', () => {
+      moving = false;
+      scaling = false;
+    });
+  }
+
+  update() {
+    if (this.target === -1) return;
+
+    const delta = this.target - this.year;
     const step = delta * 0.1;
 
     if (Math.abs(step) < 0.1) {
-      year = target;
-      target = -1;
+      this.year = this.target;
+      this.target = -1;
     } else {
-      year += step;
-      minYear += step;
-      maxYear += step;
+      this.year += step;
+      this.minYear += step;
+      this.maxYear += step;
 
-      clampPan(maxYear - minYear);
+      this.clampPan(this.maxYear - this.minYear);
     }
 
-    onYearChange(year);
+    this.onYearChange(this.year);
 
-    saveView();
-    render();
+    this.saveView();
+    this.render();
 
-    setTimeout(update, 1000 / 30);
+    setTimeout(() => this.update(), 1000 / 30);
   }
 
-  return {
-    year: () => target === -1 ? year : target,
+  getYear() {
+    return this.target === -1 ? this.year : this.target;
+  }
 
-    setYear: (newYear: number) => {
-      year = newYear;
+  setYear(newYear: number) {
+    this.year = newYear;
 
-      // Move min max to center on year
-      const range = maxYear - minYear;
-      minYear = year - range / 2;
-      maxYear = year + range / 2;
-      clampPan(range);
+    // Move min max to center on year
+    const range = this.maxYear - this.minYear;
+    this.minYear = this.year - range / 2;
+    this.maxYear = this.year + range / 2;
+    this.clampPan(range);
 
-      onYearChange(newYear);
+    this.onYearChange(newYear);
 
-      saveView();
-      render();
-    },
+    this.saveView();
+    this.render();
+  }
 
-    addEvent(event: HistoricalEvent) {
-      const img = new Image();
-      img.src = event.icon.url;
+  addEvent(event: HistoricalEvent) {
+    const img = new Image();
+    img.src = event.icon.url;
 
-      markers.push({
-        event,
-        image: img,
-      });
+    this.events.push({
+      event,
+      image: img,
+    });
 
-      img.onload = () => {
-        render();
-      };
-    },
+    img.onload = () => {
+      this.render();
+    };
+  }
 
-    setTarget: (newTarget: number) => {
-      target = newTarget;
-      update();
-    },
-  };
+  addPeriod(location: HistoricalLocation) {
+    const colorVec = getAreaColor(location.name);
+    const color = `rgb(${Math.round(colorVec.x * 255)}, ${Math.round(colorVec.y * 255)}, ${Math.round(colorVec.z * 255)})`;
+
+    this.periods.push({ location, color });
+    this.render();
+  }
+
+  setTarget(newTarget: number) {
+    this.target = newTarget;
+    this.update();
+  }
 }
-
-export type Timeline = Awaited<ReturnType<typeof initTimeline>>;

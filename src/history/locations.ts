@@ -1,6 +1,6 @@
 import { Historical } from "./history";
 import LocationsText from "./locations.txt?raw";
-import { CURRENT_YEAR } from "../timeline";
+import { parseCoordinatesAndInfo } from "./parse";
 
 // Example locations.txt file:
 /*
@@ -15,6 +15,7 @@ Caral
 
 export interface HistoricalLocation extends Historical {
   coordinates: [number, number][];
+  info?: Document;
 }
 
 export function loadLocations(): HistoricalLocation[] {
@@ -29,24 +30,14 @@ export function loadLocations(): HistoricalLocation[] {
     const period = lines[1];
     const [start, end] = period.split(",");
 
-    const coordinateLines = lines.slice(2);
-
-    let coordinates: [number, number][];
-
-    if (coordinateLines.length === 1 && !coordinateLines[0].includes(",")) {
-      const locationName = coordinateLines[0];
-      coordinates = locations.find(l => l.name === locationName)?.coordinates || [];
-    } else {
-      coordinates = coordinateLines.map(line =>
-        line.split(",").map(c => c === "present" ? CURRENT_YEAR : parseFloat(c)) as [number, number]
-      );
-    }
+    const { coordinates, info } = parseCoordinatesAndInfo(lines.slice(2), locations);
 
     const location: HistoricalLocation = {
       name,
       type: 'location',
       period: [parseFloat(start), parseFloat(end)],
-      coordinates: coordinates
+      coordinates: coordinates[0] as [number, number][],
+      info
     };
 
     locations.push(location);

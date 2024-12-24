@@ -6,6 +6,14 @@ arrow
 11.11,40.30
 17.17,45.34
 21.12,46.52
+<info>
+<text>
+The migration of humans out of Africa, known as the Out of Africa theory, marks a pivotal chapter in human history. Around 60,000 to 70,000 years ago, modern Homo sapiens began leaving Africa, their evolutionary birthplace, to explore and settle new territories. This journey was likely driven by changes in climate, resource availability, and population pressures.
+Following coastal routes, humans spread into the Arabian Peninsula and beyond, eventually reaching Europe, Asia, and, much later, the Americas and Oceania. These migrations not only shaped the genetic diversity of modern populations but also led to interactions with other hominins like Neanderthals and Denisovans, resulting in interbreeding that contributed to our genetic makeup today.
+The Out of Africa migration was fundamental in the development of human culture, technology, and adaptation to varied environments, laying the groundwork for the diverse civilizations that would emerge.
+</text>
+<youtube>https://www.youtube.com/watch?v=iM6LSUpanmg</youtube>
+</info>
 
 Migration to\nAustralia
 -65000
@@ -105,18 +113,6 @@ Tool
 marker
 43.5,-0.2
 
-First religious site
--9500
-Settlement
-marker
-Göbekli Tepe
-
-First fortified city
--9000
-Settlement
-marker
-Jericho
-
 Cultivation of\nwheat and barley
 -8500
 Farming
@@ -128,12 +124,6 @@ Cultivation of rice
 Farming
 marker
 Yangtze River Valley
-
-First large\norganised settlement
--7500
-Settlement
-marker
-Catalhoyuk
 
 Unification of Egypt
 -3150

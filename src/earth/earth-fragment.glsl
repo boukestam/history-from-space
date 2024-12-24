@@ -2,6 +2,7 @@ uniform sampler2DArray tempTexture;
 uniform sampler2DArray precTexture;
 uniform sampler2DArray iceTexture;
 uniform sampler2D heightTexture;
+uniform sampler2D lakeMaskTexture;
 uniform float sealevel;
 uniform float climateYear;
 uniform float iceYear;
@@ -88,6 +89,10 @@ void main() {
     height = (heightIntensity - 230.0) / 25.0 * 5724.0;
   }
 
+  vec4 lakeMaskColor = texture2D(lakeMaskTexture, vUv);
+  bool noLake = lakeMaskColor.r > 0.5;
+  bool yesLake = lakeMaskColor.g > 0.5;
+
   // Invert y axis
   vec2 uv = vec2(vUv.x + 0.5, 1.0 - vUv.y);
 
@@ -99,7 +104,7 @@ void main() {
 
   vec3 outColor;
 
-  if (height < sealevel) {
+  if ((height < sealevel && !noLake) || (height < 0.0 && yesLake)) {
     float darkness = 1.0 - (height / -8714.0 * 0.25);
     outColor = waterColor * darkness;
   } else {

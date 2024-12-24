@@ -5,5 +5,7 @@ export default defineConfig({
   server: {
     host: true
   },
-  plugins: [preact()],
+  plugins: [preact({
+    include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.glsl', 'src/**/*.txt'],
+  })],
 })

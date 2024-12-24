@@ -1,14 +1,15 @@
-import { fetchClimate, getSeaLevel, getClimateYear, getIceYear, FetchClimateResult } from './climate';
-import { coordinateToVec3, vec3ToCoordinate } from './coordinate';
+import { fetchClimate, getSeaLevel, getClimateYear, getIceYear, FetchClimateResult } from '../climate';
+import { coordinateToVec3, vec3ToCoordinate } from '../coordinate';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { WebGLRenderer, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Vector2, Vector3, Texture } from 'three';
-import { areaToGeometry, curveToGeometry, generateSphere } from './curve';
+import { areaToGeometry, curveToGeometry, generateSphere } from '../curve';
 
 import earthVertexShader from './earth-vertex.glsl?raw';
 import earthFragmentShader from './earth-fragment.glsl?raw';
 import riverFragmentShader from './river-fragment.glsl?raw';
 import areaFragmentShader from './area-fragment.glsl?raw';
 import arrowFragmentShader from './arrow-fragment.glsl?raw';
+import { showInfo } from '../info';
 
 export interface EarthItem {
   remove: () => void;
@@ -20,11 +21,13 @@ export interface EarthMarker extends EarthItem {
 }
 
 export interface EarthArrow extends EarthItem {
+  coordinates: [number, number][];
   arrow: Mesh;
   label?: EarthLabel;
 }
 
 export interface EarthArea extends EarthItem {
+  coordinates: [number, number][];
   area: Mesh;
   label?: EarthLabel;
 }
@@ -36,6 +39,9 @@ export interface EarthLabel {
 }
 
 const ABOVE_TERRAIN = 1.003;
+
+const MIN_CAMERA_DISTANCE = 1.25;
+const MAX_CAMERA_DISTANCE = 5;
 
 const AREA_COLORS = [
   new Vector3(229 / 255, 57 / 255, 53 / 255),
@@ -77,6 +83,7 @@ export class Earth {
   bounds: DOMRect;
 
   labels: EarthLabel[] = [];
+  arrows: EarthArrow[] = [];
   areas: EarthArea[] = [];
 
   earth: Mesh;
@@ -87,7 +94,7 @@ export class Earth {
 
   climate!: FetchClimateResult;
   heightTexture!: Texture;
-  normalTexture!: Texture;
+  lakeMaskTexture!: Texture;
   starsTexture!: Texture;
 
   raycaster = new Raycaster();
@@ -97,6 +104,8 @@ export class Earth {
   targetCoordinate: Vector2 | undefined;
 
   mouseDown: Vector2 | undefined;
+
+  projectionBlend: number = 0;
 
   constructor(
     wrapper: HTMLDivElement,
@@ -165,7 +174,8 @@ export class Earth {
       fragmentShader: arrowFragmentShader,
       uniforms: {
         color: { value: new Vector3(229 / 255, 57 / 255, 53 / 255) },
-        transparency: { value: 1 }
+        transparency: { value: 1 },
+        projectionBlend: { value: this.projectionBlend }
       },
       depthWrite: true,
       depthTest: false
@@ -179,18 +189,18 @@ export class Earth {
 
     const result = await Promise.all([
       loader.loadAsync("height.png"),
-      loader.loadAsync("normal.png"),
+      loader.loadAsync("lake-mask.png"),
       loader.loadAsync("stars.jpg"),
       fetchClimate()
     ]);
 
     this.heightTexture = result[0];
-    this.normalTexture = result[1];
+    this.lakeMaskTexture = result[1];
     this.starsTexture = result[2];
     this.climate = result[3];
 
     setTextureParameters(this.heightTexture);
-    setTextureParameters(this.normalTexture);
+    setTextureParameters(this.lakeMaskTexture);
     setTextureParameters(this.starsTexture);
 
     // Create stars
@@ -214,7 +224,7 @@ export class Earth {
 
     this.earthMaterial.uniforms = {
       heightTexture: { value: this.heightTexture },
-      normalTexture: { value: this.normalTexture },
+      lakeMaskTexture: { value: this.lakeMaskTexture },
       tempTexture: { value: this.climate.climateTextures.temp },
       precTexture: { value: this.climate.climateTextures.prec },
       iceTexture: { value: this.climate.climateTextures.ice },
@@ -222,12 +232,14 @@ export class Earth {
       climateYear: { value: getClimateYear(this.climate, this.year) },
       iceYear: { value: getIceYear(this.climate, this.year) },
       visualisation: { value: 0 },
+      projectionBlend: { value: this.projectionBlend }
     };
     this.earthMaterial.needsUpdate = true;
 
     this.riverMaterial.uniforms = {
       heightTexture: { value: this.heightTexture },
       sealevel: { value: getSeaLevel(this.climate, this.year) },
+      projectionBlend: { value: this.projectionBlend }
     };
 
     this.initRivers();
@@ -267,7 +279,7 @@ export class Earth {
     // this.sun.target.position.set(0, 0, 0);
   }
 
-  addLabel(text: string, position: Vector3) {
+  addLabel(text: string, position: Vector3, info?: Document): EarthLabel {
     const oc = "rgba(0, 0, 0, 0.5)";
     const os = 1.5;
     const ob = 1.5;
@@ -280,10 +292,21 @@ export class Earth {
     element.style.lineHeight = "1.2";
     element.style.textShadow = `-${os}px -${os}px ${ob}px ${oc},${os}px -${os}px ${ob}px ${oc}, -${os}px ${os}px ${ob}px ${oc}, ${os}px ${os}px ${ob}px ${oc},-${os}px 0px ${ob}px ${oc},${os}px 0px ${ob}px ${oc},0px -${os}px ${ob}px ${oc},0px  ${os}px ${ob}px ${oc}`;
     element.style.transform = "translate(-50%, -50%)";
-    element.style.pointerEvents = "none";
-    element.style.userSelect = "none";
-    element.style.touchAction = "none";
     this.overlay.appendChild(element);
+
+    if (info) {
+      element.style.cursor = "pointer";
+
+      element.addEventListener("mousedown", (e) => {
+        showInfo(text, info);
+        e.stopPropagation();
+        e.preventDefault();
+      }, false);
+    } else {
+      element.style.pointerEvents = "none";
+      element.style.userSelect = "none";
+      element.style.touchAction = "none";
+    }
 
     const label = { element, position, height: text.split("\n").length * 20 };
     this.labels.push(label);
@@ -421,6 +444,16 @@ export class Earth {
       this.cameraCoordinate = coordinate;
       this.targetCoordinate = undefined;
 
+      const cameraDistance = this.camera.position.length();
+      if (cameraDistance < MIN_CAMERA_DISTANCE) {
+        this.camera.position.setLength(MIN_CAMERA_DISTANCE);
+      } else if (cameraDistance > MAX_CAMERA_DISTANCE) {
+        this.camera.position.setLength(MAX_CAMERA_DISTANCE);
+      }
+
+      this.controls.rotateSpeed = (this.camera.position.length() - 1) / 2;
+      this.controls.zoomSpeed = (this.camera.position.length() - 1) / 2;
+
       this.onControlChange();
       this.render();
     });
@@ -475,8 +508,22 @@ export class Earth {
     this.animate();
   }
 
+  setProjectionBlend(projectionBlend: number) {
+    this.projectionBlend = projectionBlend;
+
+    this.earthMaterial.uniforms.projectionBlend.value = projectionBlend;
+    this.riverMaterial.uniforms.projectionBlend.value = projectionBlend;
+    this.arrowMaterial.uniforms.projectionBlend.value = projectionBlend;
+
+    for (const area of this.areas) {
+      (area.area.material as ShaderMaterial).uniforms.projectionBlend.value = projectionBlend;
+    }
+
+    this.render();
+  }
+
   // Latitude and longitude are in degrees
-  addMarker(coordinate: [number, number], text: string): EarthMarker {
+  addMarker(coordinate: [number, number], text: string, info?: Document): EarthMarker {
     const marker = new Mesh(
       new SphereGeometry(0.005, 32, 32),
       new MeshBasicMaterial({ color: 0x000000 })
@@ -486,7 +533,7 @@ export class Earth {
 
     this.scene.add(marker);
 
-    const label = this.addLabel(text, marker.position);
+    const label = this.addLabel(text, marker.position, info);
 
     this.render();
 
@@ -502,40 +549,55 @@ export class Earth {
     };
   }
 
-  addArrow(coordinates: [number, number][], text?: string): EarthArrow {
+  addArrow(coordinates: [number, number][], text?: string, info?: Document): EarthArrow {
     const curve = new CatmullRomCurve3(
       coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(ABOVE_TERRAIN))
     );
 
     const { geometry, curvePoints } = curveToGeometry(curve, 0.01, true);
 
-    const arrow = new Mesh(geometry, this.arrowMaterial);
-    arrow.renderOrder = 999;
+    const arrowMesh = new Mesh(geometry, this.arrowMaterial);
+    arrowMesh.renderOrder = 999;
 
-    this.scene.add(arrow);
+    this.scene.add(arrowMesh);
 
     let label: EarthLabel | undefined;
 
     if (text) {
       const middle = curvePoints[Math.floor(curvePoints.length / 2)];
-      label = this.addLabel(text, middle);
+      label = this.addLabel(text, middle, info);
     }
 
     this.render();
 
-    return {
-      arrow,
+    const arrow = {
+      coordinates,
+      arrow: arrowMesh,
       label,
       remove: () => {
-        this.scene.remove(arrow);
+        this.scene.remove(arrowMesh);
         if (label) this.removeLabel(label);
 
         this.render();
+
+        const index = this.arrows.indexOf(arrow);
+        if (index !== -1) this.arrows.splice(index, 1);
       }
     };
+
+    this.arrows.push(arrow);
+
+    return arrow;
   }
 
-  addArea(coordinates: [number, number][], text?: string, showControl?: boolean): EarthArea {
+  addArea(
+    coordinates: [number, number][],
+    text?: string,
+    info?: Document,
+    control?: {
+      index: number;
+    }
+  ): EarthArea {
     const { geometry, averagePoint } = areaToGeometry(coordinates);
 
     const color = getAreaColor(text || "Area");
@@ -546,7 +608,9 @@ export class Earth {
         color: { value: color },
         transparency: { value: 0.5 },
         heightTexture: { value: this.heightTexture },
+        lakeMaskTexture: { value: this.lakeMaskTexture },
         sealevel: { value: getSeaLevel(this.climate, this.year) },
+        projectionBlend: { value: this.projectionBlend }
       },
       transparent: true,
       depthWrite: false,
@@ -560,16 +624,19 @@ export class Earth {
 
     let label: EarthLabel | undefined;
     if (text) {
-      label = this.addLabel(text, averagePoint);
+      label = this.addLabel(text, averagePoint, info);
     }
 
     // Show control points
     let points: Mesh[] | undefined;
-    if (showControl) {
-      points = coordinates.map(([latitude, longitude]) => {
+    if (control) {
+      points = coordinates.map(([latitude, longitude], i) => {
         const point = new Mesh(
           new SphereGeometry(0.001, 32, 32),
-          new MeshBasicMaterial({ color: 0x000000, depthTest: false })
+          new MeshBasicMaterial({
+            color: i === control.index ? 0xffffff : 0x000000,
+            depthTest: false
+          })
         );
 
         point.position.copy(coordinateToVec3(latitude, longitude).multiplyScalar(ABOVE_TERRAIN));
@@ -582,6 +649,7 @@ export class Earth {
     this.render();
 
     const area = {
+      coordinates,
       area: areaMesh,
       label,
       points,
@@ -591,6 +659,9 @@ export class Earth {
         if (points) points.forEach(point => this.scene.remove(point));
 
         this.render();
+
+        const index = this.areas.indexOf(area);
+        if (index !== -1) this.areas.splice(index, 1);
       }
     };
 
