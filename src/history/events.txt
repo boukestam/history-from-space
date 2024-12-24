@@ -94,6 +94,13 @@ arrow
 16.66,-95.70
 11.64,-86.11
 5.27,-74.30
+<info>
+<youtube>https://www.youtube.com/watch?v=UsnrdCdGs7o</youtube>
+<text>
+The migration to the Americas, one of humanity’s last great journeys, began via the Bering Land Bridge during the last Ice Age, around 20,000 years ago. Recent discoveries, like the White Sands footprints in New Mexico, dated to 21,000–23,000 years ago, suggest humans arrived earlier than previously thought.
+Sites like Monte Verde, Chile (14,500 years ago) indicate early migrants used coastal routes or boats to spread rapidly across diverse environments. These pioneers laid the foundations for Native American cultures long before European contact, with new finds continually reshaping our understanding of their journey.
+</text>
+</info>
 
 White sands footprints
 -22000

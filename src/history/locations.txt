@@ -12,6 +12,13 @@ Göbekli Tepe challenges traditional views of prehistoric life, suggesting that 
 Jericho
 -9000,present
 31.86,35.44
+<info>
+<text>
+Jericho, located near the Jordan River in the West Bank, is one of the oldest continuously inhabited cities in the world, with evidence of settlement dating back over 10,000 years. During the Neolithic period, it became a prominent site with early agricultural activity and advanced urban planning.
+Jericho is best known for its impressive stone walls, which were likely built around 8000 BCE, making them among the earliest known fortifications. These walls, along with a massive stone tower, suggest an organized society capable of large-scale construction projects, possibly to protect against floods or rival groups.
+The city's long history and archaeological layers provide invaluable insights into early urban development, the shift from nomadic lifestyles to permanent settlements, and the rise of complex social structures in the ancient world.
+</text>
+</info>
 
 Yangtze River Valley
 -8000,-2000
@@ -33,14 +40,34 @@ Yangtze River Valley
 31.52,123.29
 37.93,123.29
 38.63,119.67
+<info>
+<youtube>https://www.youtube.com/watch?v=0zRCvtvn5NA</youtube>
+<text>
+The Yangtze River Valley, located in central China, is one of the cradles of early civilization, with evidence of human activity dating back tens of thousands of years. By around 7000 BCE, the region became a center for the development of agriculture, particularly the cultivation of rice, which remains a staple crop in East Asia today.
+Early societies along the Yangtze River practiced advanced farming techniques, built permanent settlements, and developed pottery. Sites like Hemudu and Liangzhu reveal a sophisticated culture that included intricate jade carvings and early forms of social organization. The Yangtze's fertile lands and abundant water made it a hub for innovation, contributing to the rise of Chinese civilization and its long-lasting cultural legacy.
+</text>
+</info>
 
 Catalhoyuk
 -7500,-5600
 37.67,32.83
+<info>
+<text>
+Çatalhöyük, located in modern-day Turkey, is one of the earliest examples of a large, complex human settlement, dating back to around 7500 BCE. This Neolithic site is remarkable for its tightly packed, mudbrick houses with no streets—residents entered their homes through openings in the roofs.
+The community is known for its sophisticated art and symbolic culture, with murals, figurines, and shrines found throughout the site. Çatalhöyük provides valuable insights into early urban living, communal organization, and the transition from hunter-gatherer lifestyles to settled agricultural societies.
+Its social structure appears to have been egalitarian, with shared responsibilities and resources, making it a key site for understanding early human cooperation and innovation in a pre-state society.
+</text>
+</info>
 
 Jiahu
 -7000,-5700
 33.61,113.67
+<info>
+<text>
+Jiahu, located in the Henan Province of central China, is an early Neolithic settlement dating back to around 7000 BCE. The site is notable for its advanced culture, which included rice farming, early forms of writing, and music. Archaeologists have discovered the world’s oldest playable musical instruments at Jiahu—bone flutes made from the wing bones of cranes, demonstrating the cultural sophistication of its inhabitants.
+Jiahu also yielded tortoise shells with carved symbols, which some scholars suggest may be an early precursor to Chinese writing. The settlement's combination of agricultural innovation, artistic expression, and symbolic communication highlights its importance in understanding the roots of Chinese civilization and humanity's broader cultural development.
+</text>
+</info>
 
 Vinca
 -5400,-4500
@@ -72,10 +99,25 @@ Vinca
 46.54,22.16
 46.62,21.22
 46.31,20.33
+<info>
+<text>
+The Vinča culture, flourishing between 5700 and 4500 BCE in the Danube River basin of Southeastern Europe, is one of the earliest known civilizations in Europe. Centered in modern-day Serbia and surrounding regions, the Vinča people are renowned for their advanced craftsmanship, early urban settlements, and enigmatic symbols that some believe to be a precursor to writing.
+The culture is notable for its richly decorated pottery, tools, and figurines, often featuring intricate patterns and anthropomorphic designs. Large settlements like Vinča-Belo Brdo suggest a sophisticated social organization, with structures resembling early forms of urban planning.
+One of the most intriguing aspects of the Vinča culture is the discovery of the Vinča symbols—a collection of inscribed signs found on pottery and artifacts, hinting at the possibility of a proto-writing system. This culture represents a critical step in the development of complex societies in prehistoric Europe.
+</text>
+</info>
 
 Uruk
 -5000,700
 31.32,45.64
+<info>
+<youtube>https://www.youtube.com/watch?v=aowNRbEdqPQ</youtube>
+<text>
+Uruk, located in present-day Iraq, is one of the world's first major cities and a cornerstone of Mesopotamian civilization. Emerging around 4000 BCE during the Uruk period, it became a cultural and economic powerhouse, often regarded as the birthplace of urbanization.
+Uruk is famous for its monumental architecture, including the Eanna Temple Complex and the White Temple on the ziggurat, which showcase advanced engineering and religious practices. The city is also linked to the invention of cuneiform writing, the world's earliest known script, used initially for record-keeping and later for literature, such as the Epic of Gilgamesh.
+As a center of trade, governance, and innovation, Uruk played a crucial role in shaping early state societies, influencing neighboring regions and laying the foundations for the rise of civilization in the ancient Near East.
+</text>
+</info>
 
 Mesopotamia
 -4000,-2000
@@ -98,6 +140,18 @@ Mesopotamia
 34.30,46.36
 35.59,45.28
 37.09,44.09
+<info>
+<youtube>https://www.youtube.com/watch?v=sohXPx_XZ6Y</youtube>
+<text>
+Mesopotamia, often called the "Cradle of Civilization," is a historical region located between the Tigris and Euphrates rivers in modern-day Iraq and parts of Syria, Turkey, and Iran. This fertile land, known as the Fertile Crescent, gave rise to some of the world's earliest civilizations, including Sumer, Akkad, Babylon, and Assyria.
+Mesopotamia is credited with many foundational achievements of human society, such as the invention of writing (cuneiform), the development of the wheel, advanced irrigation systems, and the establishment of city-states like Ur, Uruk, and Babylon. It was also the birthplace of significant legal, religious, and cultural innovations, including Hammurabi's Code, one of the earliest known legal systems.
+</text>
+<youtube>https://www.youtube.com/watch?v=PfYYraMgiBA</youtube>
+<text>
+The region’s agricultural surplus supported large, complex societies, while its central location made it a hub for trade and cultural exchange, influencing the development of neighboring civilizations for millennia. Mesopotamia remains a key focus for understanding the origins of human civilization.
+</text>
+<youtube>https://www.youtube.com/watch?v=d2lJUOv0hLA</youtube>
+</info>
 
 Egypt
 -3150,-30
@@ -121,10 +175,27 @@ Egypt
 26.79,30.62
 27.59,29.96
 28.75,29.79
+<info>
+<youtube>https://www.youtube.com/watch?v=Z3Wvw6BivVI</youtube>
+<text>
+Egypt, located along the fertile Nile River in northeastern Africa, is one of the world's oldest and most iconic civilizations. Emerging around 3100 BCE, ancient Egypt is renowned for its monumental achievements in architecture, art, and governance.
+The civilization was centered on the Nile, whose predictable flooding allowed for advanced agriculture and the development of a highly organized society. Egypt’s history is marked by the construction of the pyramids, including the Great Pyramid of Giza, and monumental temples like Karnak and Abu Simbel.
+Egyptians made significant advancements in writing, using hieroglyphs, and developed a centralized state with powerful rulers, the pharaohs, who were seen as divine intermediaries. Their religious beliefs emphasized the afterlife, leading to elaborate burial practices like mummification.
+Ancient Egypt’s influence spread through trade, conquest, and culture, leaving a lasting legacy on art, architecture, and knowledge that continues to fascinate the modern world.
+</text>
+<youtube>https://www.youtube.com/watch?v=YpKej05RgsY</youtube>
+</info>
 
 Norte Chico
 -3100,-1800
 -10.89,-77.52
+<info>
+<text>
+The Norte Chico civilization, also known as Caral-Supe, is the earliest known civilization in the Americas, flourishing between 3500 and 1800 BCE along the arid coast of present-day Peru. It is remarkable for its advanced social organization and monumental architecture, despite a lack of ceramics or widespread agriculture.
+Norte Chico’s society was centered around large urban settlements, with Caral being the most prominent site. The city featured massive pyramidal structures, plazas, and irrigation systems, indicating a complex, organized society. Their economy was based on fishing and the cultivation of cotton and other crops, which supported textile production and trade.
+The civilization is also noted for its quipu-like artifacts, which may represent an early form of record-keeping. Norte Chico stands as a testament to the diverse ways human societies developed complex systems independently, contributing to the broader narrative of early civilization.
+</text>
+</info>
 
 Indus Valley
 -2600,-1900
@@ -155,6 +226,15 @@ Indus Valley
 29.48,63.46
 28.14,63.11
 26.96,62.75
+<info>
+<youtube>https://www.youtube.com/watch?v=n7ndRwqJYDM</youtube>
+<text>
+The Indus Valley Civilization (c. 3300–1300 BCE), also known as Harappan Civilization, was one of the world’s earliest urban cultures, thriving in what is now Pakistan and northwest India. Centered around the Indus River and its tributaries, it is noted for its advanced urban planning, architecture, and societal organization.
+Cities like Harappa and Mohenjo-Daro featured grid-like layouts, sophisticated drainage systems, and standardized brick construction, showcasing remarkable engineering skills. The civilization was highly organized, with evidence of trade networks extending to Mesopotamia and a script that remains undeciphered.
+The economy was based on agriculture, supported by irrigation, and a flourishing trade system that included goods like beads, metals, and textiles. Despite its achievements, the civilization mysteriously declined around 1900 BCE, possibly due to environmental changes or shifting river systems.
+The Indus Valley Civilization is a cornerstone of South Asian history, representing an early example of urban complexity and cultural development.
+</text>
+</info>
 
 Maya
 -2000,1697
@@ -170,6 +250,14 @@ Maya
 14.66,-88.72
 13.33,-90.20
 13.56,-92.50
+<info>
+<text>
+The Maya Civilization, which flourished between 2000 BCE and 1500 CE in Mesoamerica, is renowned for its achievements in astronomy, mathematics, architecture, and art. Centered in present-day Mexico, Guatemala, Belize, and parts of Honduras and El Salvador, the Maya developed a sophisticated society marked by monumental cities, ceremonial centers, and intricate social hierarchies.
+The Maya are best known for their towering pyramids, such as those at Tikal and Chichén Itzá, as well as their complex writing system—the most advanced in pre-Columbian Americas—used to record history, mythology, and political events. They also developed a highly accurate calendar and made significant contributions to astronomy and mathematics, including the concept of zero.
+Maya society was organized into city-states, each with its own ruler, and relied on agriculture, particularly maize, as its economic backbone. Their civilization experienced periods of rise and decline, with a mysterious collapse in the southern lowlands around the 9th century CE, though Maya culture persisted in the northern Yucatán Peninsula until the Spanish conquest.
+The Maya legacy continues today, with millions of descendants preserving elements of their language, traditions, and cultural identity.
+</text>
+</info>
 
 Babylon
 -1890,-539
@@ -178,6 +266,14 @@ Babylon
 Babylonia
 -1890,-539
 Mesopotamia
+<info>
+<text>
+Babylonia, a prominent ancient civilization in Mesopotamia, thrived from around 1894 BCE to 539 BCE in the region of modern-day Iraq. Centered on the city of Babylon, it became a cultural and political powerhouse under leaders like Hammurabi and later Nebuchadnezzar II.
+Babylonia is famous for its legal and architectural achievements. Hammurabi’s Code, one of the earliest and most comprehensive legal systems, established principles of justice that influenced subsequent civilizations. Under Nebuchadnezzar II, Babylon saw its greatest splendor, with iconic structures like the Ishtar Gate and the legendary Hanging Gardens, one of the Seven Wonders of the Ancient World (though its existence remains debated).
+The civilization was deeply rooted in religion and science, advancing fields like astronomy and mathematics. The Babylonian calendar and early astronomical records were foundational for later developments in science.
+Babylonia fell to the Persian Empire under Cyrus the Great in 539 BCE, but its cultural and intellectual achievements left a lasting legacy on the ancient world and beyond.
+</text>
+</info>
 
 Mycenae
 -1770,-1050
@@ -193,6 +289,14 @@ Mycenae
 37.19,27.60
 38.65,26.47
 39.75,24.98
+<info>
+<text>
+Mycenaean Greece (c. 1600–1100 BCE) was the last phase of the Bronze Age in mainland Greece and represents the first advanced Greek civilization. Centered in cities like Mycenae, Pylos, and Tiryns, the Mycenaeans are renowned for their monumental architecture, extensive trade networks, and rich cultural contributions.
+The Mycenaeans built impressive palaces and fortified citadels, often featuring massive stone walls known as Cyclopean masonry. They are also famous for their elaborate shaft graves and tholos tombs, which contained treasures that reflect their wealth and craftsmanship. The Linear B script, an early form of Greek writing, was used primarily for record-keeping and is one of the key sources of information about their society.
+Their culture was hierarchical and militaristic, with a focus on kingship and warrior elites. The Mycenaeans engaged in extensive trade and interaction with neighboring civilizations, such as the Minoans, Egyptians, and Hittites.
+The civilization declined around 1100 BCE, possibly due to internal strife, natural disasters, or invasions by the Sea Peoples. This collapse marked the beginning of the Greek Dark Ages, but the legacy of Mycenaean culture deeply influenced later Greek mythology, art, and the Homeric epics like the Iliad and the Odyssey.
+</text>
+</info>
 
 Olmecs
 -1200,-400
@@ -201,6 +305,14 @@ Olmecs
 17.80,-96.20
 18.48,-96.41
 18.78,-96.05
+<info>
+<text>
+The Olmec Civilization (c. 1500–400 BCE), often referred to as the "Mother Culture" of Mesoamerica, was one of the earliest advanced civilizations in the Americas. Centered in the tropical lowlands of modern-day southern Mexico, in the states of Veracruz and Tabasco, the Olmecs laid the foundation for later Mesoamerican societies like the Maya and Aztecs.
+The Olmecs are best known for their colossal stone heads, intricately carved from basalt, which are believed to represent rulers or elites. They also built ceremonial centers, such as those at San Lorenzo and La Venta, featuring pyramids, plazas, and elaborate sculptures.
+Their society was highly organized, with a complex religious system that included early depictions of deities, such as the jaguar, a prominent symbol in Mesoamerican spirituality. The Olmecs are credited with early advancements in writing, astronomy, and possibly the development of the Mesoamerican long-count calendar.
+The civilization’s influence extended far beyond its heartland, shaping the art, religion, and political systems of later cultures. Although the reasons for their decline remain unclear, the Olmec legacy continues to resonate in the cultural history of Mesoamerica.
+</text>
+</info>
 
 Zhou Dynasty
 -1046,-256
@@ -235,6 +347,14 @@ Zhou Dynasty
 31.64,123.23
 38.05,123.39
 38.71,120.11
+<info>
+<text>
+The Zhou Dynasty (1046–256 BCE) was the longest-lasting dynasty in Chinese history, spanning nearly 800 years. It succeeded the Shang Dynasty and introduced pivotal political, cultural, and philosophical developments that shaped ancient China.
+The Zhou established the concept of the Mandate of Heaven, a belief that rulers were divinely chosen but could lose their authority if they failed to govern justly. This idea became a cornerstone of Chinese political philosophy. The dynasty is divided into two periods: the Western Zhou (1046–771 BCE), characterized by relative stability and centralized rule, and the Eastern Zhou (770–256 BCE), marked by fragmentation and the rise of independent states during the Spring and Autumn Period and the Warring States Period.
+The Zhou era was a time of cultural flourishing, with advances in agriculture, metallurgy, and governance. It also saw the emergence of Confucianism, Daoism, and Legalism, philosophical schools that profoundly influenced Chinese thought and society.
+Despite its eventual decline and loss of central power, the Zhou Dynasty's cultural and political innovations provided the foundation for imperial China and its enduring traditions.
+</text>
+</info>
 
 Chavin
 -900,-200
@@ -253,6 +373,14 @@ Chavin
 -10.31,-78.01
 -9.04,-78.55
 -8.28,-79.00
+<info>
+<text>
+The Chavín Civilization (c. 900–200 BCE) was a pre-Columbian culture in the Andean highlands of modern-day Peru. Centered at the site of Chavín de Huántar, the civilization served as a religious and cultural hub, influencing a wide region of the Andes.
+Chavín society is best known for its monumental architecture and distinctive art style, characterized by intricate carvings that blended human, animal, and supernatural forms. Iconic examples include the Lanzón, a massive stone monolith inside the Chavín de Huántar temple, and depictions of jaguars, serpents, and eagles, which played central roles in their religious symbolism.
+The Chavín were skilled in metallurgy, textiles, and agriculture, and they developed an extensive trade network that spread their cultural and artistic influence across the region. Their religion likely united diverse groups through shared rituals and pilgrimage to Chavín de Huántar.
+Though the civilization eventually declined, the Chavín set the stage for later Andean cultures like the Moche and Inca, leaving a lasting legacy in the art, religion, and social organization of the region.
+</text>
+</info>
 
 Han Dynasty
 -206,220
@@ -287,6 +415,14 @@ Han Dynasty
 28.12,116.91
 30.00,119.31
 30.95,122.01
+<info>
+<text>
+The Han Dynasty (206 BCE–220 CE) was one of China’s greatest and most influential dynasties, often considered a golden age in Chinese history. It followed the short-lived Qin Dynasty and expanded upon its centralized bureaucratic system while softening its harsh policies.
+The Han period was marked by significant advancements in governance, economy, technology, and culture. The dynasty solidified the use of Confucianism as the state philosophy, shaping Chinese values and education for centuries. Under Emperor Wu (Han Wudi), the empire expanded significantly, incorporating regions in Central Asia, Korea, and Vietnam, and establishing the Silk Road, which connected China to the Mediterranean world and fostered trade and cultural exchange.
+Innovations during the Han Dynasty included the invention of paper, improvements in agriculture, and advancements in medicine and astronomy. The Han also produced a rich literary and historical legacy, including the Records of the Grand Historian by Sima Qian.
+Despite its achievements, the dynasty faced challenges such as internal corruption, peasant uprisings, and external threats. It eventually split into the Three Kingdoms after its collapse, but the Han legacy profoundly shaped Chinese identity, with the majority ethnic group in China still referring to themselves as the Han people today.
+</text>
+</info>
 
 Roman Empire
 -270,-200
@@ -308,6 +444,14 @@ Roman Empire
 40.88,18.86
 43.66,13.72
 45.02,12.92
+<info>
+<text>
+The Roman Empire (27 BCE–476 CE in the West, and until 1453 CE in the East as the Byzantine Empire) was one of history’s most influential civilizations, encompassing vast territories across Europe, North Africa, and the Middle East. It emerged from the Roman Republic, with Augustus as its first emperor, and became known for its unparalleled military strength, administrative innovation, and cultural legacy.
+The Romans excelled in engineering and architecture, building enduring structures such as the Colosseum, aqueducts, and roads that connected the empire. Their legal system, Roman law, laid the foundation for modern Western legal principles. Latin, the empire’s language, became the root of Romance languages and a cornerstone of Western literature and education.
+Roman society thrived on trade, a strong agricultural base, and urbanization, with cities like Rome, Alexandria, and Antioch serving as cultural and economic hubs. The empire also facilitated the spread of Christianity, which eventually became its official religion under Emperor Constantine in the 4th century CE.
+The Western Roman Empire fell in 476 CE due to internal instability, economic decline, and invasions by groups like the Visigoths. However, the Eastern Roman Empire, or Byzantium, continued to preserve and transform Roman traditions until its fall in 1453 CE. The Roman Empire's contributions to law, governance, infrastructure, and culture remain cornerstones of Western civilization.
+</text>
+</info>
 
 Roman Empire
 -200,-30
