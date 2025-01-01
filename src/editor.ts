@@ -1,4 +1,4 @@
-import { isCoordinateInArea } from "./coordinate";
+import { isCoordinateInArea } from "./util/coordinate";
 import { Earth, EarthArea, EarthItem } from "./earth/earth";
 
 export type EditorMode = "none" | "arrow" | "area" | "edit";

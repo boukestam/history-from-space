@@ -1,4 +1,5 @@
-import { LinearFilter, RepeatWrapping, DataArrayTexture } from "three";
+import { LinearFilter, RepeatWrapping, DataArrayTexture, BufferGeometry, BufferAttribute } from "three";
+import { areaToGeometry } from "./util/curve";
 
 async function fetchFloats(url: string): Promise<Float32Array> {
   const response = await fetch(url);
@@ -26,7 +27,7 @@ export async function fetchClimate() {
   const [climateBytes, sealevelFloats, iceBytes, riverBytes] = await Promise.all([
     fetchBytes("climate.bin"),
     fetchFloats("sealevels.bin"),
-    fetchBytes("ice.bin"),
+    fetchBytes("ice_outline.bin"),
     fetchBytes("rivers.bin")
   ]);
 
@@ -81,37 +82,83 @@ export async function fetchClimate() {
   const tempTexture = createTexture(tempData, 97, 48, years.length);
   const precTexture = createTexture(precData, 49, 48, years.length);
 
-  // Ice data is packed into bytes, each bit is ice or no ice, 1 or 0
+  // Ice data is packed into bytes, containing 33 year chunks
+  // Each chunk starts with a 4 byte int for the size of the subsequent data
+  // Chunk:
+  // 2 byte int: number of geometries
+  // n * geometry:
+  //  2 byte int: number of points
+  //  n * 4 byte float: x, y, z
+  //  2 byte int: number of indices
+  //  n * 2 byte int: indices
 
-  // const iceWidth = 361;
-  // const iceHeight = 181;
-  const iceWidth = 1441;
-  const iceHeight = 721;
-  const iceYears = 33;
-  const sliceLength = Math.ceil(iceWidth * iceHeight / 8);
+  const iceData = new DataView(iceBytes.buffer);
 
-  const iceData = new Uint8Array(iceWidth * iceHeight * 4 * iceYears);
+  const iceGeometries = [];
 
-  for (let y = 0; y < iceYears; y++) {
-    const ice = iceBytes.slice(y * sliceLength, y * sliceLength + sliceLength);
+  for (let i = 0; i < iceBytes.length;) {
+    // const length = iceData.getUint32(i, true);
+    i += 4;
 
-    for (let i = 0; i < ice.length; i++) {
-      const byte = ice[i];
+    const geometriesLength = iceData.getUint16(i, true);
+    i += 2;
 
-      for (let j = 0; j < 8; j++) {
-        const v = byte & (1 << j) ? 255 : 0;
+    const geometries = [];
 
-        const ci = y * iceWidth * iceHeight * 4 + i * 8 * 4 + j * 4;
+    for (let j = 0; j < geometriesLength; j++) {
+      const pointsLength = iceData.getUint16(i, true);
+      i += 2;
 
-        iceData[ci] = v;
-        iceData[ci + 1] = v;
-        iceData[ci + 2] = v;
-        iceData[ci + 3] = 255;
+      if (pointsLength === 0) continue;
+
+      // const points = [];
+
+      // for (let j = 0; j < pointsLength; j++) {
+      //   const x = iceData.getFloat32(i, true);
+      //   i += 4;
+      //   const y = iceData.getFloat32(i, true);
+      //   i += 4;
+      //   const z = iceData.getFloat32(i, true);
+      //   i += 4;
+
+      //   points.push([x, y, z]);
+      // }
+
+      // const indicesLength = iceData.getUint16(i, true);
+      // i += 2;
+
+      // const indices = [];
+
+      // for (let j = 0; j < indicesLength; j++) {
+      //   indices.push(iceData.getUint16(i, true));
+      //   i += 2;
+      // }
+
+      // const geometry = new BufferGeometry();
+      // geometry.setAttribute("position", new BufferAttribute(new Float32Array(points.flat()), 3));
+      // geometry.setIndex(indices);
+
+      // geometry.computeVertexNormals();
+
+      // geometries.push(geometry);
+
+      const coordinates: [number, number][] = [];
+
+      for (let j = 0; j < pointsLength; j++) {
+        const latitude = iceData.getFloat32(i, true);
+        i += 4;
+        const longitude = iceData.getFloat32(i, true);
+        i += 4;
+
+        coordinates.push([latitude, longitude]);
       }
-    }
-  }
 
-  const iceTexture = createTexture(iceData, iceWidth, iceHeight, iceYears);
+      const { geometry } = areaToGeometry(coordinates);
+      geometries.push(geometry);
+    }
+
+    iceGeometries.push(geometries);
+  }
 
   // Load rivers
   const rivers = [];
@@ -140,10 +187,10 @@ export async function fetchClimate() {
     climateTextures: {
       temp: tempTexture,
       prec: precTexture,
-      ice: iceTexture
     },
     sealevels: sealevelFloats,
-    rivers: rivers
+    rivers: rivers,
+    iceGeometries: iceGeometries,
   };
 }
 

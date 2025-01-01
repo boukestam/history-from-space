@@ -3,7 +3,7 @@ import { HistoricalEvent, loadEvents } from "./events";
 import { HistoricalLocation, loadLocations } from "./locations";
 import { Timeline } from "../timeline";
 import { loadIcons } from "./icons";
-import { getCoordinateCenter } from "../coordinate";
+import { getCoordinateCenter } from "../util/coordinate";
 
 export type HistoricalType = 'location' | 'event';
 

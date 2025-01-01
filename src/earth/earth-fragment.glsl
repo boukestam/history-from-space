@@ -1,11 +1,9 @@
 uniform sampler2DArray tempTexture;
 uniform sampler2DArray precTexture;
-uniform sampler2DArray iceTexture;
 uniform sampler2D heightTexture;
 uniform sampler2D lakeMaskTexture;
 uniform float sealevel;
 uniform float climateYear;
-uniform float iceYear;
 uniform int visualisation;
 
 varying vec2 vUv;
@@ -100,7 +98,6 @@ void main() {
   float maxTemp = tempSample.r * 255.0 - 100.0;
   float minTemp = tempSample.g * 255.0 - 100.0;
   float precipitation = sampleData(precTexture, uv, climateYear).r * 255.0 * 10.0;
-  float ice = sampleData(iceTexture, vUv, iceYear).r;
 
   vec3 outColor;
 
@@ -122,8 +119,6 @@ void main() {
 
     outColor = color * darkness;
   }
-
-  outColor = slideColor(outColor, snowColor, ice, 0.0, 0.1);
 
   if (visualisation == 1) {
     outColor = slideColor(outColor, getTempColor(maxTemp), 0.75, 0.0, 1.0);

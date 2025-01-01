@@ -83,19 +83,19 @@ export class Timeline {
     return this.maxYear - ((Math.pow(10, value) - 1) / LOG_SKEW);
   }
 
-  yearToX(year: number, minYear: number, maxYear: number, width: number) {
-    const logMin = this.logTransformYear(minYear);
-    const logMax = this.logTransformYear(maxYear);
+  yearToX(year: number) {
+    const logMin = this.logTransformYear(this.minYear);
+    const logMax = this.logTransformYear(this.maxYear);
     const logYear = this.logTransformYear(year);
 
-    return Math.round(((logYear - logMin) / (logMax - logMin)) * width);
+    return Math.round(((logYear - logMin) / (logMax - logMin)) * this.size.width);
   }
 
-  xToYear(x: number, minYear: number, maxYear: number, width: number) {
-    const logMin = this.logTransformYear(minYear);
-    const logMax = this.logTransformYear(maxYear);
+  xToYear(x: number) {
+    const logMin = this.logTransformYear(this.minYear);
+    const logMax = this.logTransformYear(this.maxYear);
 
-    const logYear = x / width * (logMax - logMin) + logMin;
+    const logYear = x / this.size.width * (logMax - logMin) + logMin;
     return this.logInverseTransform(logYear);
   }
 
@@ -115,21 +115,55 @@ export class Timeline {
     return yearString + " " + (year < 0 ? "BC" : "AD");
   }
 
-  getStepSize(minYear: number, maxYear: number) {
-    const range = maxYear - minYear;
+  getStepSize(range: number) {
+    if (range > 25000) return 10000;
+    if (range > 10000) return 5000;
+    if (range > 5000) return 2500;
+    if (range > 2500) return 1000;
+    if (range > 1000) return 500;
+    if (range > 500) return 250;
+    if (range > 250) return 100;
+    if (range > 100) return 50;
+    if (range > 50) return 25;
+    if (range > 25) return 10;
+    if (range > 10) return 5;
+    return 1;
+  }
 
-    if (range < 100) return 10;
-    if (range < 500) return 50;
-    if (range < 1000) return 100;
-    if (range < 5000) return 500;
-    if (range < 10000) return 1000;
-    if (range < 50000) return 5000;
-    if (range < 100000) return 10000;
-    if (range < 500000) return 50000;
-    if (range < 1000000) return 100000;
-    if (range < 5000000) return 500000;
+  getSteps(): { year: number, sub: boolean }[] {
+    const xStep = this.size.width > 600 ? 150 : 75;
 
-    return 1000000;
+    const steps = [];
+
+    for (let x = -xStep * 2; x < this.size.width; x += 1) {
+      let currentYear = this.xToYear(x);
+      let nextStepYear = this.xToYear(x + xStep);
+
+      const range = nextStepYear - currentYear;
+      const stepSize = this.getStepSize(range);
+      const step = Math.ceil(nextStepYear / stepSize) * stepSize;
+
+      steps.push({ year: step, sub: false });
+
+      x = this.yearToX(step);
+    }
+
+    // Sub steps
+    const substeps = [];
+
+    for (let i = 0; i < steps.length - 1; i++) {
+      const step = steps[i];
+      const nextStep = steps[i + 1];
+
+      const range = nextStep.year - step.year;
+
+      for (let j = 1; j < 5; j++) {
+        const substep = step.year + range * j / 5;
+        substeps.push({ year: substep, sub: true });
+      }
+    }
+
+    return [...steps, ...substeps];
   }
 
   resize(canvas: HTMLCanvasElement) {
@@ -145,28 +179,18 @@ export class Timeline {
 
     this.ctx.clearRect(0, 0, this.size.width, this.size.height);
 
-    const step = this.getStepSize(this.minYear, this.maxYear);
-    const start = Math.floor(this.minYear / step) * step;
-    const end = Math.ceil(this.maxYear / step) * step;
+    const steps = this.getSteps();
 
-    let steps = [];
+    for (const step of steps) {
+      const x = this.yearToX(step.year);
 
-    for (let i = start; i <= end; i += step) {
-      const x = this.yearToX(i, this.minYear, this.maxYear, this.size.width);
-      steps.push(x);
-
-      this.ctx.fillStyle = 'lightgray';
-      this.ctx.fillRect(x, 20, 1, 40);
-      this.ctx.fillText(this.yearToString(i, step), x, 13);
-
-      if (i <= end - step) {
-        // Draw 4 substeps
-        const substep = step / 5;
-        for (let j = 1; j < 5; j++) {
-          const x = this.yearToX(i + substep * j, this.minYear, this.maxYear, this.size.width);
-          this.ctx.fillStyle = 'gray';
-          this.ctx.fillRect(x, 20, 1, 20);
-        }
+      if (!step.sub) {
+        this.ctx.fillStyle = 'lightgray';
+        this.ctx.fillRect(x, 20, 1, 40);
+        this.ctx.fillText(this.yearToString(step.year, step.year), x, 13);
+      } else {
+        this.ctx.fillStyle = 'gray';
+        this.ctx.fillRect(x, 20, 1, 20);
       }
     }
 
@@ -175,8 +199,8 @@ export class Timeline {
     for (const period of this.periods) {
       if (period.location.period[1] < this.minYear || period.location.period[0] > this.maxYear) continue;
 
-      const x1 = this.yearToX(period.location.period[0], this.minYear, this.maxYear, this.size.width);
-      const x2 = this.yearToX(period.location.period[1], this.minYear, this.maxYear, this.size.width);
+      const x1 = this.yearToX(period.location.period[0]);
+      const x2 = this.yearToX(period.location.period[1]);
 
       // Check for overlapping periods
       const overlap = renderedPeriods.filter(p => p.x1 < x2 && p.x2 > x1).length;
@@ -191,7 +215,7 @@ export class Timeline {
     }
 
     for (const marker of this.events) {
-      const x = this.yearToX(marker.event.time, this.minYear, this.maxYear, this.size.width);
+      const x = this.yearToX(marker.event.time);
 
       const markerRadius = 12;
       const markerImageSize = 16;
@@ -205,7 +229,7 @@ export class Timeline {
       this.ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
     }
 
-    const x = this.yearToX(this.year, this.minYear, this.maxYear, this.size.width);
+    const x = this.yearToX(this.year);
     this.ctx.fillStyle = 'white';
     this.ctx.fillRect(x - 1, 20, 3, 40);
     this.ctx.fillText(this.yearToString(this.year, 1), x, 13);
@@ -225,7 +249,7 @@ export class Timeline {
     const rect = this.canvas.getBoundingClientRect();
     const x = clientX - rect.left;
 
-    let newYear = this.xToYear(x, this.minYear, this.maxYear, this.size.width);
+    let newYear = this.xToYear(x);
     newYear = Math.max(MIN_YEAR, Math.min(MAX_YEAR, newYear));
 
     this.onYearChange(newYear);
@@ -241,7 +265,7 @@ export class Timeline {
 
     // Zoom in/out from the cursor
     const zoom = delta > 0 ? (1 + zoomSpeed) : 1 / (1 + zoomSpeed);
-    const cursorYear = this.xToYear(x, this.minYear, this.maxYear, this.size.width);
+    const cursorYear = this.xToYear(x);
 
     this.minYear = cursorYear - (cursorYear - this.minYear) * zoom;
     this.maxYear = cursorYear + (this.maxYear - cursorYear) * zoom;

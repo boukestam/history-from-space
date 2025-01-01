@@ -100,6 +100,7 @@ Vinca
 46.62,21.22
 46.31,20.33
 <info>
+<youtube>https://www.youtube.com/watch?v=n7L7KZFrACc</youtube>
 <text>
 The Vinča culture, flourishing between 5700 and 4500 BCE in the Danube River basin of Southeastern Europe, is one of the earliest known civilizations in Europe. Centered in modern-day Serbia and surrounding regions, the Vinča people are renowned for their advanced craftsmanship, early urban settlements, and enigmatic symbols that some believe to be a precursor to writing.
 The culture is notable for its richly decorated pottery, tools, and figurines, often featuring intricate patterns and anthropomorphic designs. Large settlements like Vinča-Belo Brdo suggest a sophisticated social organization, with structures resembling early forms of urban planning.
@@ -190,6 +191,7 @@ Norte Chico
 -3100,-1800
 -10.89,-77.52
 <info>
+<youtube>https://www.youtube.com/watch?v=0aSe1Q-asr4</youtube>
 <text>
 The Norte Chico civilization, also known as Caral-Supe, is the earliest known civilization in the Americas, flourishing between 3500 and 1800 BCE along the arid coast of present-day Peru. It is remarkable for its advanced social organization and monumental architecture, despite a lack of ceramics or widespread agriculture.
 Norte Chico’s society was centered around large urban settlements, with Caral being the most prominent site. The city featured massive pyramidal structures, plazas, and irrigation systems, indicating a complex, organized society. Their economy was based on fishing and the cultivation of cotton and other crops, which supported textile production and trade.
@@ -251,12 +253,14 @@ Maya
 13.33,-90.20
 13.56,-92.50
 <info>
+<youtube>https://www.youtube.com/watch?v=z9YwfTerAdA</youtube>
 <text>
 The Maya Civilization, which flourished between 2000 BCE and 1500 CE in Mesoamerica, is renowned for its achievements in astronomy, mathematics, architecture, and art. Centered in present-day Mexico, Guatemala, Belize, and parts of Honduras and El Salvador, the Maya developed a sophisticated society marked by monumental cities, ceremonial centers, and intricate social hierarchies.
 The Maya are best known for their towering pyramids, such as those at Tikal and Chichén Itzá, as well as their complex writing system—the most advanced in pre-Columbian Americas—used to record history, mythology, and political events. They also developed a highly accurate calendar and made significant contributions to astronomy and mathematics, including the concept of zero.
 Maya society was organized into city-states, each with its own ruler, and relied on agriculture, particularly maize, as its economic backbone. Their civilization experienced periods of rise and decline, with a mysterious collapse in the southern lowlands around the 9th century CE, though Maya culture persisted in the northern Yucatán Peninsula until the Spanish conquest.
 The Maya legacy continues today, with millions of descendants preserving elements of their language, traditions, and cultural identity.
 </text>
+<youtube>https://www.youtube.com/watch?v=7MFKy7DJsCY</youtube>
 </info>
 
 Babylon
@@ -306,6 +310,7 @@ Olmecs
 18.48,-96.41
 18.78,-96.05
 <info>
+<youtube>https://www.youtube.com/watch?v=lSO-bFwMx2I</youtube>
 <text>
 The Olmec Civilization (c. 1500–400 BCE), often referred to as the "Mother Culture" of Mesoamerica, was one of the earliest advanced civilizations in the Americas. Centered in the tropical lowlands of modern-day southern Mexico, in the states of Veracruz and Tabasco, the Olmecs laid the foundation for later Mesoamerican societies like the Maya and Aztecs.
 The Olmecs are best known for their colossal stone heads, intricately carved from basalt, which are believed to represent rulers or elites. They also built ceremonial centers, such as those at San Lorenzo and La Venta, featuring pyramids, plazas, and elaborate sculptures.
@@ -374,6 +379,7 @@ Chavin
 -9.04,-78.55
 -8.28,-79.00
 <info>
+<youtube>https://www.youtube.com/watch?v=TCfQjn0lG74</youtube>
 <text>
 The Chavín Civilization (c. 900–200 BCE) was a pre-Columbian culture in the Andean highlands of modern-day Peru. Centered at the site of Chavín de Huántar, the civilization served as a religious and cultural hub, influencing a wide region of the Andes.
 Chavín society is best known for its monumental architecture and distinctive art style, characterized by intricate carvings that blended human, animal, and supernatural forms. Iconic examples include the Lanzón, a massive stone monolith inside the Chavín de Huántar temple, and depictions of jaguars, serpents, and eagles, which played central roles in their religious symbolism.
@@ -416,6 +422,7 @@ Han Dynasty
 30.00,119.31
 30.95,122.01
 <info>
+<youtube>https://www.youtube.com/watch?v=FwEkp4I75OA</youtube>
 <text>
 The Han Dynasty (206 BCE–220 CE) was one of China’s greatest and most influential dynasties, often considered a golden age in Chinese history. It followed the short-lived Qin Dynasty and expanded upon its centralized bureaucratic system while softening its harsh policies.
 The Han period was marked by significant advancements in governance, economy, technology, and culture. The dynasty solidified the use of Confucianism as the state philosophy, shaping Chinese values and education for centuries. Under Emperor Wu (Han Wudi), the empire expanded significantly, incorporating regions in Central Asia, Korea, and Vietnam, and establishing the Silk Road, which connected China to the Mediterranean world and fostered trade and cultural exchange.
@@ -561,6 +568,9 @@ Mississippian
 34.53,-78.53
 24.47,-80.07
 23.93,-83.97
+<info>
+<youtube>https://www.youtube.com/watch?v=iciOvaIm51M</youtube>
+</info>
 
 Toltec
 950,1150
@@ -577,6 +587,9 @@ Toltec
 25.40,-100.46
 24.17,-99.51
 21.63,-99.26
+<info>
+<youtube>https://www.youtube.com/watch?v=fI_bOUh9e0c</youtube>
+</info>
 
 Aztec
 1428,1521
@@ -589,6 +602,9 @@ Aztec
 16.89,-95.77
 18.18,-95.55
 19.53,-96.37
+<info>
+<youtube>https://www.youtube.com/watch?v=f8JVdpWCKeM</youtube>
+</info>
 
 Inca
 1438,1533 
@@ -613,3 +629,6 @@ Inca
 -9.34,-74.98
 -6.20,-76.12
 -2.44,-77.25
+<info>
+<youtube>https://www.youtube.com/watch?v=BRB9dJmZhVk</youtube>
+</info>

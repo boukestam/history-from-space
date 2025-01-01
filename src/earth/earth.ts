@@ -1,14 +1,15 @@
 import { fetchClimate, getSeaLevel, getClimateYear, getIceYear, FetchClimateResult } from '../climate';
-import { coordinateToVec3, vec3ToCoordinate } from '../coordinate';
+import { coordinateToVec3, vec3ToCoordinate } from '../util/coordinate';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { WebGLRenderer, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Vector2, Vector3, Texture } from 'three';
-import { areaToGeometry, curveToGeometry, generateSphere } from '../curve';
+import { areaToGeometry, curveToGeometry, generateSphere } from '../util/curve';
 
 import earthVertexShader from './earth-vertex.glsl?raw';
 import earthFragmentShader from './earth-fragment.glsl?raw';
 import riverFragmentShader from './river-fragment.glsl?raw';
 import areaFragmentShader from './area-fragment.glsl?raw';
 import arrowFragmentShader from './arrow-fragment.glsl?raw';
+import iceFragmentShader from './ice-fragment.glsl?raw';
 import { showInfo } from '../info';
 
 export interface EarthItem {
@@ -91,6 +92,7 @@ export class Earth {
   earthMaterial: ShaderMaterial;
   riverMaterial: ShaderMaterial;
   arrowMaterial: ShaderMaterial;
+  iceMaterial: ShaderMaterial;
 
   climate!: FetchClimateResult;
   heightTexture!: Texture;
@@ -106,6 +108,9 @@ export class Earth {
   mouseDown: Vector2 | undefined;
 
   projectionBlend: number = 0;
+
+  iceMeshes: Mesh[][] = [];
+  existingIceMeshes: Mesh[] = [];
 
   constructor(
     wrapper: HTMLDivElement,
@@ -140,9 +145,8 @@ export class Earth {
     this.cameraCoordinate = this.getLatLon(new Vector2(0, 0))!;
 
     this.controls = new OrbitControls(this.camera, this.overlay);
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.1;
     this.controls.enablePan = false;
+    this.controls.enableDamping = false;
 
     // Load camera position from local storage for development
     const cameraPosition = localStorage.getItem("camera");
@@ -175,6 +179,16 @@ export class Earth {
       uniforms: {
         color: { value: new Vector3(229 / 255, 57 / 255, 53 / 255) },
         transparency: { value: 1 },
+        projectionBlend: { value: this.projectionBlend }
+      },
+      depthWrite: true,
+      depthTest: false
+    });
+
+    this.iceMaterial = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: iceFragmentShader,
+      uniforms: {
         projectionBlend: { value: this.projectionBlend }
       },
       depthWrite: true,
@@ -227,10 +241,8 @@ export class Earth {
       lakeMaskTexture: { value: this.lakeMaskTexture },
       tempTexture: { value: this.climate.climateTextures.temp },
       precTexture: { value: this.climate.climateTextures.prec },
-      iceTexture: { value: this.climate.climateTextures.ice },
       sealevel: { value: getSeaLevel(this.climate, this.year) },
       climateYear: { value: getClimateYear(this.climate, this.year) },
-      iceYear: { value: getIceYear(this.climate, this.year) },
       visualisation: { value: 0 },
       projectionBlend: { value: this.projectionBlend }
     };
@@ -242,7 +254,18 @@ export class Earth {
       projectionBlend: { value: this.projectionBlend }
     };
 
+    this.arrowMaterial.uniforms.heightTexture = { value: this.heightTexture };
+    this.iceMaterial.uniforms.heightTexture = { value: this.heightTexture };
+
     this.initRivers();
+
+    // Create ice meshes
+
+    this.iceMeshes = this.climate.iceGeometries.map(geometries =>
+      geometries.map(geometry => new Mesh(geometry, this.iceMaterial))
+    );
+
+    this.updateIce();
 
     this.render();
   }
@@ -258,6 +281,21 @@ export class Earth {
 
       const riverMesh = new Mesh(geometry, this.riverMaterial);
       this.scene.add(riverMesh);
+    }
+  }
+
+  updateIce() {
+    const iceYear = Math.floor(getIceYear(this.climate, this.year));
+
+    for (const existing of this.existingIceMeshes) {
+      this.scene.remove(existing);
+    }
+
+    this.existingIceMeshes = [];
+
+    for (const mesh of this.iceMeshes[iceYear]) {
+      this.scene.add(mesh);
+      this.existingIceMeshes.push(mesh);
     }
   }
 
@@ -482,10 +520,11 @@ export class Earth {
   }
 
   setYear(year: number) {
+    this.year = year;
+
     const sealevel = getSeaLevel(this.climate, year);
 
     this.earthMaterial.uniforms.climateYear.value = getClimateYear(this.climate, year + 1);
-    this.earthMaterial.uniforms.iceYear.value = getIceYear(this.climate, year);
     this.earthMaterial.uniforms.sealevel.value = sealevel;
 
     this.riverMaterial.uniforms.sealevel.value = sealevel;
@@ -493,6 +532,8 @@ export class Earth {
     for (const area of this.areas) {
       (area.area.material as ShaderMaterial).uniforms.sealevel.value = sealevel;
     }
+
+    this.updateIce();
 
     this.render();
   }
