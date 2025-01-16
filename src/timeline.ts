@@ -403,9 +403,9 @@ export class Timeline {
     if (this.target === -1) return;
 
     const delta = this.target - this.year;
-    const step = delta * 0.1;
+    const step = delta * 0.25;
 
-    if (Math.abs(step) < 0.1) {
+    if (Math.abs(step) < (MAX_YEAR + 100 - this.target) * 0.001) {
       this.year = this.target;
       this.target = -1;
     } else {

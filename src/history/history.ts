@@ -34,23 +34,52 @@ function getEventCoordinates(event: HistoricalEvent): [number, number][][] {
   );
 }
 
-export async function initHistory(earth: Earth, timeline: Timeline, initialYear: number) {
-  const icons = loadIcons();
-  const locations = loadLocations();
-  const events = loadEvents(locations, icons);
+function getTime(item: Historical) {
+  if (item.type === 'location') {
+    return (item as HistoricalLocation).period[0];
+  } else {
+    return (item as HistoricalEvent).time;
+  }
+}
 
-  const items = [...locations, ...events].sort((a, b) => a.period[0] - b.period[0]);
+function getItemCenter(item: Historical) {
+  if (item.type === 'location') {
+    return getCoordinateCenter((item as HistoricalLocation).coordinates);
+  } else {
+    return getEventCenter(item as HistoricalEvent);
+  }
+}
 
-  for (const event of events) {
-    timeline.addEvent(event);
+export class HistoryManager {
+
+  private earth: Earth;
+  private timeline: Timeline;
+
+  private items: Historical[] = [];
+
+  constructor(earth: Earth, timeline: Timeline, initialYear: number) {
+    this.earth = earth;
+    this.timeline = timeline;
+
+    const icons = loadIcons();
+    const locations = loadLocations();
+    const events = loadEvents(locations, icons);
+
+    this.items = [...locations, ...events].sort((a, b) => a.period[0] - b.period[0]);
+
+    for (const event of events) {
+      timeline.addEvent(event);
+    }
+
+    for (const location of locations) {
+      timeline.addPeriod(location);
+    }
+
+    this.updateMap(initialYear);
   }
 
-  for (const location of locations) {
-    timeline.addPeriod(location);
-  }
-
-  function updateMap(year: number) {
-    for (const item of items) {
+  updateMap(year: number) {
+    for (const item of this.items) {
       if (item.period[0] > year || item.period[1] < year) {
         if (item.removable) {
           item.removable.remove();
@@ -63,59 +92,53 @@ export async function initHistory(earth: Earth, timeline: Timeline, initialYear:
           const location = item as HistoricalLocation;
 
           if (location.coordinates.length === 1) {
-            location.removable = earth.addMarker(location.coordinates[0], location.name, location.info);
+            location.removable = this.earth.addMarker(location.coordinates[0], location.name, location.info);
           } else {
-            location.removable = earth.addArea(location.coordinates, location.name, location.info);
+            location.removable = this.earth.addArea(location.coordinates, location.name, location.info);
           }
         } else if (item.type === 'event') {
           const event = item as HistoricalEvent;
 
           if (event.eventType === 'arrow') {
-            const arrows = getEventCoordinates(event).map((coordinates, i) => earth.addArrow(
+            const arrows = getEventCoordinates(event).map((coordinates, i) => this.earth.addArrow(
               coordinates,
               i === 0 ? event.name : "",
               i === 0 ? event.info : undefined
             ));
             event.removable = { remove: () => arrows.forEach(arrow => arrow.remove()) };
           } else if (event.eventType === 'marker') {
-            event.removable = earth.addMarker(getEventCenter(event), event.name, event.info);
+            event.removable = this.earth.addMarker(getEventCenter(event), event.name, event.info);
           }
         }
       }
     }
   }
 
-  updateMap(initialYear);
+  setYear(year: number) {
+    this.updateMap(year);
+  }
 
-  return {
-    setYear: (year: number) => {
-      updateMap(year);
-    },
+  skipToPreviousEvent() {
+    const currentYear = this.timeline.getYear();
+    const previous = this.items.slice()
+      .sort((a, b) => getTime(b) - getTime(a))
+      .find(item => getTime(item) < currentYear);
 
-    skipToPreviousEvent: () => {
-      const currentYear = timeline.getYear();
-      const previousEvent = events.slice()
-        .sort((a, b) => b.time - a.time)
-        .find(event => event.time < currentYear);
-
-      if (previousEvent) {
-        timeline.setTarget(previousEvent.time);
-        earth.setTarget(getEventCenter(previousEvent));
-      }
-    },
-
-    skipToNextEvent: () => {
-      const currentYear = timeline.getYear();
-      const nextEvent = events.slice()
-        .sort((a, b) => a.time - b.time)
-        .find(event => event.time > currentYear);
-
-      if (nextEvent) {
-        timeline.setTarget(nextEvent.time);
-        earth.setTarget(getEventCenter(nextEvent));
-      }
+    if (previous) {
+      this.timeline.setTarget(getTime(previous));
+      this.earth.setTarget(getItemCenter(previous));
     }
-  };
-}
+  }
 
-export type HistoryManager = Awaited<ReturnType<typeof initHistory>>;
+  skipToNextEvent() {
+    const currentYear = this.timeline.getYear();
+    const next = this.items.slice()
+      .sort((a, b) => getTime(a) - getTime(b))
+      .find(item => getTime(item) > currentYear);
+
+    if (next) {
+      this.timeline.setTarget(getTime(next));
+      this.earth.setTarget(getItemCenter(next));
+    }
+  }
+}

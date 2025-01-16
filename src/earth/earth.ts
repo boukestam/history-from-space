@@ -141,7 +141,7 @@ export class Earth {
 
     this.scene = new Scene();
 
-    this.camera = new PerspectiveCamera(45, this.bounds.width / this.bounds.height, 0.01, 1000);
+    this.camera = new PerspectiveCamera(45, this.bounds.width / this.bounds.height, 0.01, 100);
     this.cameraCoordinate = this.getLatLon(new Vector2(0, 0))!;
 
     this.controls = new OrbitControls(this.camera, this.overlay);
@@ -151,10 +151,14 @@ export class Earth {
     // Load camera position from local storage for development
     const cameraPosition = localStorage.getItem("camera");
     if (cameraPosition) {
-      this.camera.position.copy(JSON.parse(cameraPosition));
+      const { position, blend } = JSON.parse(cameraPosition);
+      this.camera.position.copy(position);
+      this.projectionBlend = blend;
     } else {
       this.camera.position.set(0, 0, 3);
     }
+
+    this.controls.target.set(0, 0, 0);
     this.controls.update();
 
     const geometry = generateSphere(1, 720, 360);
@@ -299,9 +303,12 @@ export class Earth {
     }
   }
 
-  onControlChange() {
+  saveView() {
     // Store camera position in local storage for development
-    localStorage.setItem("camera", JSON.stringify(this.camera.position));
+    localStorage.setItem("camera", JSON.stringify({
+      position: this.camera.position,
+      blend: this.projectionBlend
+    }));
 
     // const dx = this.camera.position.x - this.earth.position.x;
     // const dz = this.camera.position.z - this.earth.position.z;
@@ -359,6 +366,8 @@ export class Earth {
 
   updateLabels() {
     const cameraNormal = this.camera.position.clone().normalize();
+
+    this.camera.updateMatrixWorld();
 
     const calculatedLabels: { x: number, y: number, label: EarthLabel, show: boolean }[] = [];
 
@@ -492,7 +501,7 @@ export class Earth {
       this.controls.rotateSpeed = (this.camera.position.length() - 1) / 2;
       this.controls.zoomSpeed = (this.camera.position.length() - 1) / 2;
 
-      this.onControlChange();
+      this.saveView();
       this.render();
     });
 
@@ -555,11 +564,13 @@ export class Earth {
     this.earthMaterial.uniforms.projectionBlend.value = projectionBlend;
     this.riverMaterial.uniforms.projectionBlend.value = projectionBlend;
     this.arrowMaterial.uniforms.projectionBlend.value = projectionBlend;
+    this.iceMaterial.uniforms.projectionBlend.value = projectionBlend;
 
     for (const area of this.areas) {
       (area.area.material as ShaderMaterial).uniforms.projectionBlend.value = projectionBlend;
     }
 
+    this.saveView();
     this.render();
   }
 

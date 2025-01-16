@@ -1,47 +1,62 @@
 import { Historical } from "./history";
-import LocationsText from "./locations.txt?raw";
 import { parseCoordinatesAndInfo } from "./parse";
 
-// Example locations.txt file:
-/*
-Egypt
--3150,-30
-30.045534,31.230703
+import MiddleEast from "./locations/middle-east.txt?raw";
+import Asia from "./locations/asia.txt?raw";
+import Europe from "./locations/europe.txt?raw";
+import Oceania from "./locations/oceania.txt?raw";
+import Africa from "./locations/africa.txt?raw";
+import Americas from "./locations/americas.txt?raw";
 
-Caral
--2600,-1800
--10.892006,-77.523324
-*/
+export type Region = 'Middle East' | 'Asia' | 'Europe' | 'Oceania' | 'Africa' | 'Americas';
 
 export interface HistoricalLocation extends Historical {
+  region: Region;
   coordinates: [number, number][];
   info?: Document;
 }
 
-export function loadLocations(): HistoricalLocation[] {
-  const locationParts = LocationsText.replace(/\r\n/g, "\n").split("\n\n");
+function loadLocationsFile(text: string, region: Region): HistoricalLocation[] {
+  const locationParts = text.replace(/\r\n/g, "\n").split("\n\n").filter(s => s.trim().length > 0);
 
   const locations: HistoricalLocation[] = [];
 
   for (const locationPart of locationParts) {
-    const lines = locationPart.split("\n");
+    try {
+      const lines = locationPart.split("\n");
 
-    const name = lines[0];
-    const period = lines[1];
-    const [start, end] = period.split(",");
+      const name = lines[0];
+      const period = lines[1];
+      const [start, end] = period.split(",");
 
-    const { coordinates, info } = parseCoordinatesAndInfo(lines.slice(2), locations);
+      const { coordinates, info } = parseCoordinatesAndInfo(lines.slice(2), locations);
 
-    const location: HistoricalLocation = {
-      name,
-      type: 'location',
-      period: [parseFloat(start), parseFloat(end)],
-      coordinates: coordinates[0] as [number, number][],
-      info
-    };
+      const location: HistoricalLocation = {
+        name,
+        type: 'location',
+        region,
+        period: [parseFloat(start), parseFloat(end)],
+        coordinates: coordinates[0] as [number, number][],
+        info
+      };
 
-    locations.push(location);
+      locations.push(location);
+    } catch (e) {
+      console.error(`Error parsing location: ${locationPart} in ${region}`);
+      console.error(e);
+    }
   }
 
   return locations;
+}
+
+export function loadLocations(): HistoricalLocation[] {
+  return [
+    ...loadLocationsFile(MiddleEast, 'Middle East'),
+    ...loadLocationsFile(Asia, 'Asia'),
+    ...loadLocationsFile(Europe, 'Europe'),
+    ...loadLocationsFile(Oceania, 'Oceania'),
+    ...loadLocationsFile(Africa, 'Africa'),
+    ...loadLocationsFile(Americas, 'Americas')
+  ];
 }

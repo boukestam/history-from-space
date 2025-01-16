@@ -1,0 +1,166 @@
+Göbekli Tepe
+-9500,-8000
+37.22,38.92
+<info>
+<text>
+Göbekli Tepe is an archaeological site in southeastern Turkey, often regarded as the world’s oldest known temple complex. Dating back over 11,000 years, it predates agriculture and the advent of cities, making it a groundbreaking discovery in understanding early human societies. The site features massive stone pillars arranged in circular formations, intricately carved with images of animals and abstract symbols.
+Göbekli Tepe challenges traditional views of prehistoric life, suggesting that complex social and spiritual organization existed before settled farming communities. This hints at the possibility that religious or communal rituals may have played a role in driving the development of agriculture and permanent settlements. Its discovery has reshaped our understanding of humanity's transition from hunter-gatherers to organized societies.
+</text>
+<wiki>https://en.wikipedia.org/wiki/G%C3%B6bekli_Tepe</wiki>
+</info>
+
+Jericho
+-9000,-4000
+31.86,35.44
+<info>
+<text>
+Jericho, located near the Jordan River in the West Bank, is one of the oldest continuously inhabited cities in the world, with evidence of settlement dating back over 10,000 years. During the Neolithic period, it became a prominent site with early agricultural activity and advanced urban planning.
+Jericho is best known for its impressive stone walls, which were likely built around 8000 BCE, making them among the earliest known fortifications. These walls, along with a massive stone tower, suggest an organized society capable of large-scale construction projects, possibly to protect against floods or rival groups.
+The city's long history and archaeological layers provide invaluable insights into early urban development, the shift from nomadic lifestyles to permanent settlements, and the rise of complex social structures in the ancient world.
+</text>
+</info>
+
+Catalhoyuk
+-7500,-5600
+37.67,32.83
+<info>
+<text>
+Çatalhöyük, located in modern-day Turkey, is one of the earliest examples of a large, complex human settlement, dating back to around 7500 BCE. This Neolithic site is remarkable for its tightly packed, mudbrick houses with no streets—residents entered their homes through openings in the roofs.
+The community is known for its sophisticated art and symbolic culture, with murals, figurines, and shrines found throughout the site. Çatalhöyük provides valuable insights into early urban living, communal organization, and the transition from hunter-gatherer lifestyles to settled agricultural societies.
+Its social structure appears to have been egalitarian, with shared responsibilities and resources, making it a key site for understanding early human cooperation and innovation in a pre-state society.
+</text>
+</info>
+
+Uruk
+-5000,-2000
+31.32,45.64
+<info>
+<youtube>https://www.youtube.com/watch?v=aowNRbEdqPQ</youtube>
+<text>
+Uruk, located in present-day Iraq, is one of the world's first major cities and a cornerstone of Mesopotamian civilization. Emerging around 4000 BCE during the Uruk period, it became a cultural and economic powerhouse, often regarded as the birthplace of urbanization.
+Uruk is famous for its monumental architecture, including the Eanna Temple Complex and the White Temple on the ziggurat, which showcase advanced engineering and religious practices. The city is also linked to the invention of cuneiform writing, the world's earliest known script, used initially for record-keeping and later for literature, such as the Epic of Gilgamesh.
+As a center of trade, governance, and innovation, Uruk played a crucial role in shaping early state societies, influencing neighboring regions and laying the foundations for the rise of civilization in the ancient Near East.
+</text>
+</info>
+
+Mesopotamia
+-4000,-2000
+38.34,40.82
+37.19,37.23
+35.95,35.01
+30.96,34.14
+29.78,35.41
+31.22,37.39
+33.30,38.35
+34.61,38.76
+34.17,40.18
+33.19,41.67
+31.51,43.87
+30.59,45.68
+29.28,48.72
+29.75,49.90
+32.55,49.50
+33.66,48.26
+34.30,46.36
+35.59,45.28
+37.09,44.09
+<info>
+<youtube>https://www.youtube.com/watch?v=sohXPx_XZ6Y</youtube>
+<text>
+Mesopotamia, often called the "Cradle of Civilization," is a historical region located between the Tigris and Euphrates rivers in modern-day Iraq and parts of Syria, Turkey, and Iran. This fertile land, known as the Fertile Crescent, gave rise to some of the world's earliest civilizations, including Sumer, Akkad, Babylon, and Assyria.
+Mesopotamia is credited with many foundational achievements of human society, such as the invention of writing (cuneiform), the development of the wheel, advanced irrigation systems, and the establishment of city-states like Ur, Uruk, and Babylon. It was also the birthplace of significant legal, religious, and cultural innovations, including Hammurabi's Code, one of the earliest known legal systems.
+</text>
+<youtube>https://www.youtube.com/watch?v=PfYYraMgiBA</youtube>
+<text>
+The region’s agricultural surplus supported large, complex societies, while its central location made it a hub for trade and cultural exchange, influencing the development of neighboring civilizations for millennia. Mesopotamia remains a key focus for understanding the origins of human civilization.
+</text>
+<youtube>https://www.youtube.com/watch?v=d2lJUOv0hLA</youtube>
+</info>
+
+Egypt
+-3150,-31
+30.68,28.88
+32.01,29.45
+32.29,31.87
+30.58,32.42
+29.15,31.77
+28.20,31.42
+27.13,32.17
+26.11,33.18
+24.70,33.30
+23.25,33.20
+22.13,32.60
+21.41,31.54
+21.73,30.69
+22.70,31.17
+23.60,31.69
+24.67,31.99
+25.96,31.35
+26.79,30.62
+27.59,29.96
+28.75,29.79
+<info>
+<youtube>https://www.youtube.com/watch?v=Z3Wvw6BivVI</youtube>
+<text>
+Egypt, located along the fertile Nile River in northeastern Africa, is one of the world's oldest and most iconic civilizations. Emerging around 3100 BCE, ancient Egypt is renowned for its monumental achievements in architecture, art, and governance.
+The civilization was centered on the Nile, whose predictable flooding allowed for advanced agriculture and the development of a highly organized society. Egypt’s history is marked by the construction of the pyramids, including the Great Pyramid of Giza, and monumental temples like Karnak and Abu Simbel.
+Egyptians made significant advancements in writing, using hieroglyphs, and developed a centralized state with powerful rulers, the pharaohs, who were seen as divine intermediaries. Their religious beliefs emphasized the afterlife, leading to elaborate burial practices like mummification.
+Ancient Egypt’s influence spread through trade, conquest, and culture, leaving a lasting legacy on art, architecture, and knowledge that continues to fascinate the modern world.
+</text>
+<youtube>https://www.youtube.com/watch?v=YpKej05RgsY</youtube>
+</info>
+
+Indus Valley
+-2600,-1900
+26.46,59.66
+25.53,59.47
+22.27,65.40
+19.67,70.89
+21.07,72.36
+23.20,72.40
+24.31,72.15
+25.37,70.96
+26.64,69.55
+27.57,70.56
+28.27,71.72
+29.24,72.85
+30.01,75.24
+30.83,77.66
+31.32,79.66
+33.10,80.28
+34.46,78.84
+35.80,76.99
+36.41,73.31
+34.54,71.44
+32.42,70.09
+31.11,67.74
+31.38,66.37
+31.04,63.86
+29.48,63.46
+28.14,63.11
+26.96,62.75
+<info>
+<youtube>https://www.youtube.com/watch?v=n7ndRwqJYDM</youtube>
+<text>
+The Indus Valley Civilization (c. 3300–1300 BCE), also known as Harappan Civilization, was one of the world’s earliest urban cultures, thriving in what is now Pakistan and northwest India. Centered around the Indus River and its tributaries, it is noted for its advanced urban planning, architecture, and societal organization.
+Cities like Harappa and Mohenjo-Daro featured grid-like layouts, sophisticated drainage systems, and standardized brick construction, showcasing remarkable engineering skills. The civilization was highly organized, with evidence of trade networks extending to Mesopotamia and a script that remains undeciphered.
+The economy was based on agriculture, supported by irrigation, and a flourishing trade system that included goods like beads, metals, and textiles. Despite its achievements, the civilization mysteriously declined around 1900 BCE, possibly due to environmental changes or shifting river systems.
+The Indus Valley Civilization is a cornerstone of South Asian history, representing an early example of urban complexity and cultural development.
+</text>
+</info>
+
+Babylon
+-1890,-539
+32.53,44.42
+
+Babylonia
+-1890,-539
+Mesopotamia
+<info>
+<text>
+Babylonia, a prominent ancient civilization in Mesopotamia, thrived from around 1894 BCE to 539 BCE in the region of modern-day Iraq. Centered on the city of Babylon, it became a cultural and political powerhouse under leaders like Hammurabi and later Nebuchadnezzar II.
+Babylonia is famous for its legal and architectural achievements. Hammurabi’s Code, one of the earliest and most comprehensive legal systems, established principles of justice that influenced subsequent civilizations. Under Nebuchadnezzar II, Babylon saw its greatest splendor, with iconic structures like the Ishtar Gate and the legendary Hanging Gardens, one of the Seven Wonders of the Ancient World (though its existence remains debated).
+The civilization was deeply rooted in religion and science, advancing fields like astronomy and mathematics. The Babylonian calendar and early astronomical records were foundational for later developments in science.
+Babylonia fell to the Persian Empire under Cyrus the Great in 539 BCE, but its cultural and intellectual achievements left a lasting legacy on the ancient world and beyond.
+</text>
+</info>

@@ -1,6 +1,6 @@
 import { initControls } from './controls';
-import { Earth, EarthItem } from './earth/earth';
-import { initHistory } from './history/history';
+import { Earth } from './earth/earth';
+import { HistoryManager } from './history/history';
 import { Timeline, toKYear } from './timeline';
 
 import './index.css';
@@ -36,7 +36,7 @@ async function init() {
 
   const editor = new Editor(earth);
 
-  const history = await initHistory(earth, timeline, timeline.getYear());
+  const history = new HistoryManager(earth, timeline, timeline.getYear());
 
   initControls(history, earth, editor);
 }

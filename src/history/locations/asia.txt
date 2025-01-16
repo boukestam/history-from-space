@@ -1,0 +1,126 @@
+Yangtze River Valley
+-8000,-2000
+38.27,118.03
+37.67,114.43
+36.93,112.85
+36.18,111.11
+34.95,108.63
+33.44,107.25
+32.66,105.00
+30.89,105.38
+30.27,107.23
+29.30,109.56
+27.83,112.27
+27.50,114.83
+28.02,117.62
+29.05,119.04
+30.12,120.98
+31.52,123.29
+37.93,123.29
+38.63,119.67
+<info>
+<youtube>https://www.youtube.com/watch?v=0zRCvtvn5NA</youtube>
+<text>
+The Yangtze River Valley, located in central China, is one of the cradles of early civilization, with evidence of human activity dating back tens of thousands of years. By around 7000 BCE, the region became a center for the development of agriculture, particularly the cultivation of rice, which remains a staple crop in East Asia today.
+Early societies along the Yangtze River practiced advanced farming techniques, built permanent settlements, and developed pottery. Sites like Hemudu and Liangzhu reveal a sophisticated culture that included intricate jade carvings and early forms of social organization. The Yangtze's fertile lands and abundant water made it a hub for innovation, contributing to the rise of Chinese civilization and its long-lasting cultural legacy.
+</text>
+</info>
+
+Jiahu
+-7000,-5700
+33.61,113.67
+<info>
+<text>
+Jiahu, located in the Henan Province of central China, is an early Neolithic settlement dating back to around 7000 BCE. The site is notable for its advanced culture, which included rice farming, early forms of writing, and music. Archaeologists have discovered the world’s oldest playable musical instruments at Jiahu—bone flutes made from the wing bones of cranes, demonstrating the cultural sophistication of its inhabitants.
+Jiahu also yielded tortoise shells with carved symbols, which some scholars suggest may be an early precursor to Chinese writing. The settlement's combination of agricultural innovation, artistic expression, and symbolic communication highlights its importance in understanding the roots of Chinese civilization and humanity's broader cultural development.
+</text>
+</info>
+
+Zhou Dynasty
+-1046,-256
+40.43,121.66
+41.51,122.07
+41.16,119.86
+39.92,118.28
+38.95,116.73
+39.16,114.40
+39.47,112.89
+40.26,111.40
+40.64,109.78
+41.09,107.78
+40.74,106.82
+39.93,109.07
+39.25,110.84
+38.41,110.39
+37.39,109.22
+36.19,107.95
+35.38,106.80
+33.66,104.95
+31.92,103.52
+28.87,104.34
+28.61,106.73
+29.77,108.94
+29.68,110.95
+27.91,112.98
+28.75,114.63
+29.16,116.05
+29.87,118.61
+30.27,120.48
+31.64,123.23
+38.05,123.39
+38.71,120.11
+<info>
+<text>
+The Zhou Dynasty (1046–256 BCE) was the longest-lasting dynasty in Chinese history, spanning nearly 800 years. It succeeded the Shang Dynasty and introduced pivotal political, cultural, and philosophical developments that shaped ancient China.
+The Zhou established the concept of the Mandate of Heaven, a belief that rulers were divinely chosen but could lose their authority if they failed to govern justly. This idea became a cornerstone of Chinese political philosophy. The dynasty is divided into two periods: the Western Zhou (1046–771 BCE), characterized by relative stability and centralized rule, and the Eastern Zhou (770–256 BCE), marked by fragmentation and the rise of independent states during the Spring and Autumn Period and the Warring States Period.
+The Zhou era was a time of cultural flourishing, with advances in agriculture, metallurgy, and governance. It also saw the emergence of Confucianism, Daoism, and Legalism, philosophical schools that profoundly influenced Chinese thought and society.
+Despite its eventual decline and loss of central power, the Zhou Dynasty's cultural and political innovations provided the foundation for imperial China and its enduring traditions.
+</text>
+</info>
+
+Han Dynasty
+-206,220
+37.39,126.41
+39.07,127.30
+40.07,128.39
+41.37,127.52
+41.98,124.17
+42.88,121.30
+41.83,117.79
+42.37,114.26
+42.00,111.72
+41.62,107.98
+40.58,104.87
+38.04,103.03
+39.59,97.65
+41.27,96.04
+39.94,93.09
+37.71,93.74
+36.89,99.91
+34.66,99.72
+32.73,99.66
+30.53,102.37
+28.70,101.30
+23.36,103.57
+20.52,103.92
+17.97,105.37
+20.06,108.96
+20.45,111.13
+22.47,115.28
+25.39,115.43
+28.12,116.91
+30.00,119.31
+30.95,122.01
+<info>
+<youtube>https://www.youtube.com/watch?v=FwEkp4I75OA</youtube>
+<text>
+The Han Dynasty (206 BCE–220 CE) was one of China’s greatest and most influential dynasties, often considered a golden age in Chinese history. It followed the short-lived Qin Dynasty and expanded upon its centralized bureaucratic system while softening its harsh policies.
+The Han period was marked by significant advancements in governance, economy, technology, and culture. The dynasty solidified the use of Confucianism as the state philosophy, shaping Chinese values and education for centuries. Under Emperor Wu (Han Wudi), the empire expanded significantly, incorporating regions in Central Asia, Korea, and Vietnam, and establishing the Silk Road, which connected China to the Mediterranean world and fostered trade and cultural exchange.
+Innovations during the Han Dynasty included the invention of paper, improvements in agriculture, and advancements in medicine and astronomy. The Han also produced a rich literary and historical legacy, including the Records of the Grand Historian by Sima Qian.
+Despite its achievements, the dynasty faced challenges such as internal corruption, peasant uprisings, and external threats. It eventually split into the Three Kingdoms after its collapse, but the Han legacy profoundly shaped Chinese identity, with the majority ethnic group in China still referring to themselves as the Han people today.
+</text>
+</info>
+
+Angkor
+800,1431
+13.41,103.86
