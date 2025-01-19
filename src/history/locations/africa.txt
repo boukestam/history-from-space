@@ -1,0 +1,32 @@
+Egypt
+-3150,-31
+30.68,28.88
+32.01,29.45
+32.29,31.87
+30.58,32.42
+29.15,31.77
+28.20,31.42
+27.13,32.17
+26.11,33.18
+24.70,33.30
+23.25,33.20
+22.13,32.60
+21.41,31.54
+21.73,30.69
+22.70,31.17
+23.60,31.69
+24.67,31.99
+25.96,31.35
+26.79,30.62
+27.59,29.96
+28.75,29.79
+<info>
+<youtube>https://www.youtube.com/watch?v=Z3Wvw6BivVI</youtube>
+<text>
+Egypt, located along the fertile Nile River in northeastern Africa, is one of the world's oldest and most iconic civilizations. Emerging around 3100 BCE, ancient Egypt is renowned for its monumental achievements in architecture, art, and governance.
+The civilization was centered on the Nile, whose predictable flooding allowed for advanced agriculture and the development of a highly organized society. Egypt’s history is marked by the construction of the pyramids, including the Great Pyramid of Giza, and monumental temples like Karnak and Abu Simbel.
+Egyptians made significant advancements in writing, using hieroglyphs, and developed a centralized state with powerful rulers, the pharaohs, who were seen as divine intermediaries. Their religious beliefs emphasized the afterlife, leading to elaborate burial practices like mummification.
+Ancient Egypt’s influence spread through trade, conquest, and culture, leaving a lasting legacy on art, architecture, and knowledge that continues to fascinate the modern world.
+</text>
+<youtube>https://www.youtube.com/watch?v=YpKej05RgsY</youtube>
+</info>

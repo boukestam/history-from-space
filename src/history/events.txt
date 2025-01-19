@@ -114,12 +114,6 @@ Tool
 marker
 29.56,115.96
 
-Magdalenian culture
--17000
-Tool
-marker
-43.5,-0.2
-
 Cultivation of\nwheat and barley
 -8500
 Farming
@@ -137,3 +131,19 @@ Unification of Egypt
 Sphinx
 marker
 Egypt
+
+Alexander the Great
+-336
+Battle
+arrow
+40.95,24.48
+40.03,27.93
+38.24,29.19
+40.06,36.48
+34.01,41.45
+30.85,49.45
+35.93,47.33
+36.13,55.02
+30.56,58.06
+33.61,64.47
+37.94,62.66

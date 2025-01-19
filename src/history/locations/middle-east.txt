@@ -1,3 +1,14 @@
+Natufian culture
+-13000,-9500
+32.55,33.34
+30.54,34.01
+29.94,37.37
+32.47,39.10
+34.27,38.53
+36.64,40.23
+37.63,38.86
+35.19,35.21
+
 Göbekli Tepe
 -9500,-8000
 37.22,38.92
@@ -77,39 +88,6 @@ The region’s agricultural surplus supported large, complex societies, while it
 <youtube>https://www.youtube.com/watch?v=d2lJUOv0hLA</youtube>
 </info>
 
-Egypt
--3150,-31
-30.68,28.88
-32.01,29.45
-32.29,31.87
-30.58,32.42
-29.15,31.77
-28.20,31.42
-27.13,32.17
-26.11,33.18
-24.70,33.30
-23.25,33.20
-22.13,32.60
-21.41,31.54
-21.73,30.69
-22.70,31.17
-23.60,31.69
-24.67,31.99
-25.96,31.35
-26.79,30.62
-27.59,29.96
-28.75,29.79
-<info>
-<youtube>https://www.youtube.com/watch?v=Z3Wvw6BivVI</youtube>
-<text>
-Egypt, located along the fertile Nile River in northeastern Africa, is one of the world's oldest and most iconic civilizations. Emerging around 3100 BCE, ancient Egypt is renowned for its monumental achievements in architecture, art, and governance.
-The civilization was centered on the Nile, whose predictable flooding allowed for advanced agriculture and the development of a highly organized society. Egypt’s history is marked by the construction of the pyramids, including the Great Pyramid of Giza, and monumental temples like Karnak and Abu Simbel.
-Egyptians made significant advancements in writing, using hieroglyphs, and developed a centralized state with powerful rulers, the pharaohs, who were seen as divine intermediaries. Their religious beliefs emphasized the afterlife, leading to elaborate burial practices like mummification.
-Ancient Egypt’s influence spread through trade, conquest, and culture, leaving a lasting legacy on art, architecture, and knowledge that continues to fascinate the modern world.
-</text>
-<youtube>https://www.youtube.com/watch?v=YpKej05RgsY</youtube>
-</info>
-
 Indus Valley
 -2600,-1900
 26.46,59.66
@@ -150,12 +128,39 @@ The Indus Valley Civilization is a cornerstone of South Asian history, represent
 </info>
 
 Babylon
--1890,-539
+-1800,500
 32.53,44.42
 
-Babylonia
--1890,-539
-Mesopotamia
+Assyrian Empire
+-883,-630
+36.28,35.22
+38.37,40.67
+37.12,44.28
+35.27,48.27
+34.18,54.40
+32.79,53.75
+32.55,50.05
+30.02,49.93
+29.30,47.85
+32.47,43.79
+34.94,41.02
+34.03,36.86
+31.43,35.00
+31.83,33.75
+
+Babylonian Empire
+-626,-539
+36.20,35.01
+38.44,40.71
+37.08,44.28
+34.41,46.13
+33.28,48.98
+30.04,49.85
+29.16,48.49
+31.13,40.66
+29.71,36.25
+29.96,34.21
+31.66,33.60
 <info>
 <text>
 Babylonia, a prominent ancient civilization in Mesopotamia, thrived from around 1894 BCE to 539 BCE in the region of modern-day Iraq. Centered on the city of Babylon, it became a cultural and political powerhouse under leaders like Hammurabi and later Nebuchadnezzar II.
@@ -164,3 +169,31 @@ The civilization was deeply rooted in religion and science, advancing fields lik
 Babylonia fell to the Persian Empire under Cyrus the Great in 539 BCE, but its cultural and intellectual achievements left a lasting legacy on the ancient world and beyond.
 </text>
 </info>
+
+Persian Empire
+-550,-330
+35.67,30.18
+37.02,26.57
+40.42,25.88
+42.45,28.55
+41.90,41.32
+40.35,51.14
+40.15,56.44
+43.81,60.86
+39.41,63.01
+38.06,69.63
+33.45,71.77
+29.23,70.43
+23.81,67.33
+25.14,57.12
+26.61,56.62
+25.53,53.16
+29.20,48.54
+28.93,47.23
+32.72,39.48
+27.68,33.94
+22.71,36.54
+21.80,31.38
+27.18,28.44
+29.35,24.31
+32.92,26.19

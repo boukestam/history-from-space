@@ -13,3 +13,7 @@ Hut.svg
 Sphinx
 Sphinx.svg
 #EDDCCF
+
+Battle
+Battle.svg
+#CFEDED

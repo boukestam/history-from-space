@@ -42,6 +42,8 @@ export function loadEvents(locations: HistoricalLocation[], icons: Icon[]): Hist
       info
     };
 
+    console.log(event);
+
     return event;
   });
 }

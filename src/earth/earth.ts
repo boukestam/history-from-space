@@ -182,9 +182,10 @@ export class Earth {
       fragmentShader: arrowFragmentShader,
       uniforms: {
         color: { value: new Vector3(229 / 255, 57 / 255, 53 / 255) },
-        transparency: { value: 1 },
+        transparency: { value: 0.8 },
         projectionBlend: { value: this.projectionBlend }
       },
+      transparent: true,
       depthWrite: true,
       depthTest: false
     });
