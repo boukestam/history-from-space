@@ -36,6 +36,35 @@ Jiahu also yielded tortoise shells with carved symbols, which some scholars sugg
 </text>
 </info>
 
+Erlitou
+-2070,-1600
+34.693,112.689
+
+Shang Dynasty
+-1600,-1046
+38.72,118.91
+40.60,117.31
+39.49,115.62
+37.66,115.27
+36.62,114.11
+37.65,112.41
+36.63,110.55
+35.63,108.56
+34.27,108.04
+34.02,110.20
+32.49,111.51
+30.82,112.59
+29.67,114.90
+31.32,117.52
+34.08,119.02
+35.43,121.10
+36.90,123.66
+38.26,121.78
+
+Anyang
+-1400,-1046
+36.099,114.392
+
 Zhou Dynasty
 -1046,-256
 40.43,121.66
@@ -77,6 +106,14 @@ The Zhou era was a time of cultural flourishing, with advances in agriculture, m
 Despite its eventual decline and loss of central power, the Zhou Dynasty's cultural and political innovations provided the foundation for imperial China and its enduring traditions.
 </text>
 </info>
+
+Luoyang
+-770,220
+34.6197,112.4539
+
+Xianyang
+-350,-206
+34.3299,108.7088
 
 Han Dynasty
 -206,220
@@ -120,6 +157,10 @@ Innovations during the Han Dynasty included the invention of paper, improvements
 Despite its achievements, the dynasty faced challenges such as internal corruption, peasant uprisings, and external threats. It eventually split into the Three Kingdoms after its collapse, but the Han legacy profoundly shaped Chinese identity, with the majority ethnic group in China still referring to themselves as the Han people today.
 </text>
 </info>
+
+Chang’an
+-202,907
+34.308333,108.858333
 
 Angkor
 800,1431

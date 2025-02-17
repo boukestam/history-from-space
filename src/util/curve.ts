@@ -1,6 +1,11 @@
-import { BufferAttribute, BufferGeometry, CatmullRomCurve3, Vector3 } from "three";
+import {
+  BufferAttribute,
+  BufferGeometry,
+  CatmullRomCurve3,
+  Vector3,
+} from "three";
 import { coordinateToVec3, vec3ToCoordinate } from "./coordinate";
-import Delaunator from 'delaunator';
+import Delaunator from "delaunator";
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { polygon, point } from "@turf/helpers";
 import { bbox } from "@turf/bbox";
@@ -23,7 +28,10 @@ function createGeometry(vertices: number[]) {
   }
 
   const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new BufferAttribute(new Float32Array(vertices), 3));
+  geometry.setAttribute(
+    "position",
+    new BufferAttribute(new Float32Array(vertices), 3)
+  );
   geometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
 
   geometry.computeVertexNormals();
@@ -31,7 +39,11 @@ function createGeometry(vertices: number[]) {
   return geometry;
 }
 
-export function generateSphere(radius: number, widthSegments: number, heightSegments: number) {
+export function generateSphere(
+  radius: number,
+  widthSegments: number,
+  heightSegments: number
+) {
   const vertices: number[] = [];
   const indices: number[] = [];
 
@@ -67,8 +79,12 @@ export function generateSphere(radius: number, widthSegments: number, heightSegm
   return geometry;
 }
 
-
-export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: boolean, quality: number = 100) {
+export function curveToGeometry(
+  curve: CatmullRomCurve3,
+  radius: number,
+  head: boolean,
+  quality: number = 100
+) {
   const curveLength = curve.getLength();
   const curveSegments = Math.round(curveLength * quality);
   const segmentLength = curveLength / curveSegments;
@@ -79,8 +95,8 @@ export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: b
   let previousTopLeft: Vector3 | undefined;
   let previousTopRight: Vector3 | undefined;
 
-  const arrowHeadRadius = 0.03;
-  const arrowHeadLength = 0.05;
+  const arrowHeadRadius = 3 * radius;
+  const arrowHeadLength = 5 * radius;
 
   for (let i = 0; i < curvePoints.length - 1; i++) {
     const from = curvePoints[i];
@@ -91,25 +107,41 @@ export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: b
     const up = to.clone().normalize();
     const right = new Vector3().crossVectors(forward, up).normalize();
 
-    const bottomLeft = previousTopLeft || from.clone().sub(right.clone().multiplyScalar(radius));
-    const bottomRight = previousTopRight || from.clone().add(right.clone().multiplyScalar(radius));
+    const bottomLeft =
+      previousTopLeft || from.clone().sub(right.clone().multiplyScalar(radius));
+    const bottomRight =
+      previousTopRight ||
+      from.clone().add(right.clone().multiplyScalar(radius));
     const topLeft = to.clone().sub(right.clone().multiplyScalar(radius));
     const topRight = to.clone().add(right.clone().multiplyScalar(radius));
 
     vertices.push(
-      bottomLeft.x, bottomLeft.y, bottomLeft.z,
-      bottomRight.x, bottomRight.y, bottomRight.z,
-      topRight.x, topRight.y, topRight.z,
+      bottomLeft.x,
+      bottomLeft.y,
+      bottomLeft.z,
+      bottomRight.x,
+      bottomRight.y,
+      bottomRight.z,
+      topRight.x,
+      topRight.y,
+      topRight.z,
 
-      bottomLeft.x, bottomLeft.y, bottomLeft.z,
-      topRight.x, topRight.y, topRight.z,
-      topLeft.x, topLeft.y, topLeft.z
+      bottomLeft.x,
+      bottomLeft.y,
+      bottomLeft.z,
+      topRight.x,
+      topRight.y,
+      topRight.z,
+      topLeft.x,
+      topLeft.y,
+      topLeft.z
     );
 
     // Arrow head
     if (head && i === curvePoints.length - 2) {
       // Remove the last part that overlaps
-      const overlappingSegments = Math.floor(arrowHeadLength / segmentLength) - 2;
+      const overlappingSegments =
+        Math.floor(arrowHeadLength / segmentLength) - 2;
       vertices.splice(-18 * overlappingSegments, 18 * overlappingSegments);
 
       const headLength = forward.clone().multiplyScalar(arrowHeadLength);
@@ -121,9 +153,15 @@ export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: b
       const headRight = headBase.clone().add(headSide);
 
       vertices.push(
-        headLeft.x, headLeft.y, headLeft.z,
-        headRight.x, headRight.y, headRight.z,
-        headTop.x, headTop.y, headTop.z
+        headLeft.x,
+        headLeft.y,
+        headLeft.z,
+        headRight.x,
+        headRight.y,
+        headRight.z,
+        headTop.x,
+        headTop.y,
+        headTop.z
       );
     }
 
@@ -136,7 +174,10 @@ export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: b
   return { geometry, curvePoints };
 }
 
-export function outlineToTriangles(coordinates: [number, number][], step: number = 0.025) {
+export function outlineToTriangles(
+  coordinates: [number, number][],
+  step: number = 0.025
+) {
   const poly = polygon([coordinates]);
   const box = bbox(poly);
   const [minX, minY, maxX, maxY] = box;
@@ -156,7 +197,11 @@ export function outlineToTriangles(coordinates: [number, number][], step: number
   // Filter out triangles that are not part of the outline
   const indices = [];
   for (let i = 0; i < delaunay.triangles.length; i += 3) {
-    const [c, b, a] = [delaunay.triangles[i], delaunay.triangles[i + 1], delaunay.triangles[i + 2]];
+    const [c, b, a] = [
+      delaunay.triangles[i],
+      delaunay.triangles[i + 1],
+      delaunay.triangles[i + 2],
+    ];
     const [x, y, z] = [points[a], points[b], points[c]];
 
     const middle = point([(x[0] + y[0] + z[0]) / 3, (x[1] + y[1] + z[1]) / 3]);
@@ -169,20 +214,31 @@ export function outlineToTriangles(coordinates: [number, number][], step: number
 }
 
 export function areaToGeometry(coordinates: [number, number][]) {
-  const outlinePoints = coordinates.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude));
-  const averagePoint = outlinePoints.reduce((total, point) => total.add(point), new Vector3()).divideScalar(outlinePoints.length);
+  const outlinePoints = coordinates.map(([latitude, longitude]) =>
+    coordinateToVec3(latitude, longitude)
+  );
+  const averagePoint = outlinePoints
+    .reduce((total, point) => total.add(point), new Vector3())
+    .divideScalar(outlinePoints.length)
+    .normalize();
 
   const projection = new Projection(averagePoint);
-  const projectedPoints = outlinePoints.map(point => projection.project3DTo2D(point));
+  const projectedPoints = outlinePoints.map((point) =>
+    projection.project3DTo2D(point)
+  );
 
   const curve = new CatmullRomCurve3(projectedPoints, true);
   const curveLength = curve.getLength();
   const curveSegments = Math.round(curveLength * 200);
   const curvePoints = curve.getPoints(curveSegments);
 
-  const { points, indices, box } = outlineToTriangles(curvePoints.map(p => [p.x, p.y]));
+  const { points, indices, box } = outlineToTriangles(
+    curvePoints.map((p) => [p.x, p.y])
+  );
 
-  const points3D = points.map(p => projection.project2DTo3D(new Vector3(p[0], p[1], 0)));
+  const points3D = points.map((p) =>
+    projection.project2DTo3D(new Vector3(p[0], p[1], 0))
+  );
 
   // Debug draw triangles on a canvas
   // const canvas = document.createElement("canvas");
@@ -227,5 +283,27 @@ export function areaToGeometry(coordinates: [number, number][]) {
 
   const geometry = createGeometry(vertices);
 
-  return { geometry, averagePoint };
+  // Determine the center of the geometry by averaging the sum of all triangles and their area
+  let center = new Vector3();
+  let totalArea = 0;
+
+  for (let i = 0; i < indices.length; i += 3) {
+    const [a, b, c] = [
+      points3D[indices[i]],
+      points3D[indices[i + 1]],
+      points3D[indices[i + 2]],
+    ];
+
+    const normal = new Vector3().crossVectors(
+      b.clone().sub(a),
+      c.clone().sub(a)
+    );
+    const area = normal.length() / 2;
+    center.add(a.clone().add(b).add(c).divideScalar(3).multiplyScalar(area));
+    totalArea += area;
+  }
+
+  center.divideScalar(totalArea).normalize();
+
+  return { geometry, center };
 }
