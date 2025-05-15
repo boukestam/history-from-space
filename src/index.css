@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   touch-action: none;
+}
+
+.marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid black;
 }

@@ -163,6 +163,10 @@ Cucuteni-Trypillia culture
 <youtube>https://www.youtube.com/watch?v=Bk2Qbf1YQbI</youtube>
 </info>
 
+Troy
+-3600,500
+39.9575,26.238889
+
 Yamnaya culture
 -3300,-2600
 48.04,51.62
@@ -215,6 +219,10 @@ Minoan
 36.31,22.47
 34.78,23.32
 
+Knossos
+-1900,-1350
+35.298056,25.163056
+
 Mycenae
 -1600,-1050
 40.02,22.59
@@ -229,6 +237,7 @@ Mycenae
 38.05,26.24
 38.85,26.30
 <info>
+<youtube>https://www.youtube.com/watch?v=cki-9ANZTLg</youtube>
 <text>
 Mycenaean Greece (c. 1600–1100 BCE) was the last phase of the Bronze Age in mainland Greece and represents the first advanced Greek civilization. Centered in cities like Mycenae, Pylos, and Tiryns, the Mycenaeans are renowned for their monumental architecture, extensive trade networks, and rich cultural contributions.
 The Mycenaeans built impressive palaces and fortified citadels, often featuring massive stone walls known as Cyclopean masonry. They are also famous for their elaborate shaft graves and tholos tombs, which contained treasures that reflect their wealth and craftsmanship. The Linear B script, an early form of Greek writing, was used primarily for record-keeping and is one of the key sources of information about their society.
@@ -236,6 +245,10 @@ Their culture was hierarchical and militaristic, with a focus on kingship and wa
 The civilization declined around 1100 BCE, possibly due to internal strife, natural disasters, or invasions by the Sea Peoples. This collapse marked the beginning of the Greek Dark Ages, but the legacy of Mycenaean culture deeply influenced later Greek mythology, art, and the Homeric epics like the Iliad and the Odyssey.
 </text>
 </info>
+
+Athens
+-1556,present
+37.984167,23.728056
 
 Hallstatt culture
 -1200,-500
@@ -301,6 +314,10 @@ Ancient Greece
 34.53,26.59
 34.86,21.44
 38.52,19.43
+
+Rome
+-753,present
+41.9,12.483333
 
 La Tène culture
 -500,0

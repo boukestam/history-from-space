@@ -1,5 +1,5 @@
 Migration out\nof Africa
--70000
+-70000,5000
 Tool
 arrow
 5.09,35.88
@@ -16,7 +16,7 @@ The Out of Africa migration was fundamental in the development of human culture,
 </info>
 
 Migration to\nAustralia
--65000
+-65000,5000
 Tool
 arrow
 25.47,54.94
@@ -43,7 +43,7 @@ arrow
 -16.09,132.46
 
 Migration to\nEurope
--45000
+-45000,5000
 Tool
 arrow
 23.79,75.42
@@ -56,7 +56,7 @@ arrow
 45.92,18.96
 
 Migration to\nAsia
--45000
+-45000,5000
 Tool
 arrow
 21.26,77.66
@@ -66,20 +66,8 @@ arrow
 27.55,97.35
 29.74,103.11
 
-Oldest cave\npaintings
--45000
-Tool
-marker
--4.78,119.66
-
-Bone flutes\nin Swabia Jura
--42000
-Tool
-marker
-48.40,9.77
-
 Migration to\nAmerica
--25000
+-25000,2500
 Tool
 arrow
 32.45,120.07
@@ -102,38 +90,29 @@ Sites like Monte Verde, Chile (14,500 years ago) indicate early migrants used co
 </text>
 </info>
 
-White sands footprints
--22000
-Tool
-marker
-32.87,-106.32
-
-Earliest pottery\nin Xianren Cave
--20000
-Tool
-marker
-29.56,115.96
-
 Cultivation of\nwheat and barley
--8500
+-8500,500
 Farming
 marker
 Mesopotamia
 
 Cultivation of rice
--8000
+-8000,500
 Farming
 marker
 Yangtze River Valley
 
-Unification of Egypt
--3150
-Sphinx
-marker
-Egypt
+Trojan War
+-1190,100
+Battle
+arrow
+38.08,23.76
+38.26,24.90
+39.31,25.03
+39.96,26.18
 
 Alexander the Great
--336
+-336,20
 Battle
 arrow
 40.95,24.48

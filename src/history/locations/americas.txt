@@ -1,3 +1,7 @@
+White sands footprints
+-23000,-21000
+32.87,-106.32
+
 Norte Chico
 -3100,-1800
 -10.89,-77.52
@@ -65,6 +69,14 @@ Adena culture
 38.48,-79.07
 41.01,-77.68
 
+Tikal
+-400,900
+17.221944,-89.623611
+
+Teotihuacan
+-200,750
+19.6925,-98.843889
+
 Hopewell culture
 -200,500
 36.88,-90.96
@@ -121,12 +133,9 @@ Though the civilization eventually declined, the Chavín set the stage for later
 </text>
 </info>
 
-Teotihuacan
--100,550
-19.6925,-98.843889
-<info>
-<youtube>https://www.youtube.com/watch?v=aV6ZZZsCjK8</youtube>
-</info>
+Chichen Itza
+600,1200
+20.683056,-88.568611
 
 Mississippian culture
 800,1600
