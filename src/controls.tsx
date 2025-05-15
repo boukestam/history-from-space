@@ -44,6 +44,11 @@ export function Controls({history, earth, editor}: {history: HistoryManager, ear
       <input type="range" min="0" max="1" step="0.01" value={earth.projectionBlend} onInput={(e) => {
         earth.setProjectionBlend(parseFloat(e.currentTarget.value));
       }} />
+
+      <Button onClick={() => earth.toggleBorders()}>Borders</Button>
+      <Button onClick={() => earth.toggleRivers()}>Rivers</Button>
+      <Button onClick={() => earth.toggleIce()}>Ice</Button>
+      <Button onClick={() => earth.toggleItems()}>Items</Button>
     </div>
   );
 }

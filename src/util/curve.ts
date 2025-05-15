@@ -109,7 +109,7 @@ export function curveToGeometry(curve: CatmullRomCurve3, radius: number, head: b
     // Arrow head
     if (head && i === curvePoints.length - 2) {
       // Remove the last part that overlaps
-      const overlappingSegments = Math.floor(arrowHeadLength / segmentLength) - 2;
+      const overlappingSegments = Math.floor(arrowHeadLength / segmentLength) - 1;
       vertices.splice(-18 * overlappingSegments, 18 * overlappingSegments);
 
       const headLength = forward.clone().multiplyScalar(arrowHeadLength);

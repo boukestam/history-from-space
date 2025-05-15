@@ -38,7 +38,38 @@ async function init() {
 
   const history = new HistoryManager(earth, timeline, timeline.getYear());
 
-  initControls(history, earth, editor);
+  const style = document.createElement('style');
+
+  if (import.meta.env.MODE === 'development') {
+    initControls(history, earth, editor);
+
+    style.textContent = `
+      .h-header {
+        height: 80px;
+      }
+
+      .top-header {
+        top: 80px;
+      }
+    `;
+  } else {
+    earth.toggleItems();
+
+    style.textContent = `
+      .h-header {
+        height: 60px;
+      }
+
+      .top-header {
+        top: 60px;
+      }
+    `;
+  }
+
+  document.head.appendChild(style)
+
+  // Debug
+  //earth.rotate(30);
 }
 
 init().catch(console.error);

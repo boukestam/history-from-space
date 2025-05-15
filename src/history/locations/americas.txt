@@ -121,6 +121,13 @@ Though the civilization eventually declined, the Chavín set the stage for later
 </text>
 </info>
 
+Teotihuacan
+-100,550
+19.6925,-98.843889
+<info>
+<youtube>https://www.youtube.com/watch?v=aV6ZZZsCjK8</youtube>
+</info>
+
 Mississippian culture
 800,1600
 29.20,-94.88

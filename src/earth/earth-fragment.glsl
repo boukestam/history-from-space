@@ -108,7 +108,11 @@ void main() {
     float darkness = 1.0 - (height / 5724.0 * 0.25);
 
     vec3 color = slideColor(
-      slideColor(snowColor, slideColor(desertColor, grassColor, precipitation, 250.0, 500.0), maxTemp, 5.0, 10.0),
+      slideColor(
+        snowColor, 
+        slideColor(desertColor, grassColor, precipitation, 250.0, 500.0), 
+        maxTemp, 5.0, 10.0
+      ),
       slideColor(
         slideColor(desertColor, grassColor, precipitation, 400.0, 1000.0),
         slideColor(grassColor, forestColor, precipitation, 1000.0, 2000.0),

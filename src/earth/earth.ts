@@ -1,8 +1,9 @@
 import { fetchClimate, getSeaLevel, getClimateYear, getIceYear, FetchClimateResult } from '../climate';
 import { coordinateToVec3, vec3ToCoordinate } from '../util/coordinate';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { WebGLRenderer, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Vector2, Vector3, Texture } from 'three';
+import { WebGLRenderer, LinearFilter, PerspectiveCamera, Scene, SRGBColorSpace, TextureLoader, CatmullRomCurve3, DirectionalLight, Mesh, MeshBasicMaterial, MeshStandardMaterial, Raycaster, RepeatWrapping, ShaderMaterial, Sphere, SphereGeometry, Vector2, Vector3, Texture, Group, Line, LineBasicMaterial, BufferGeometry, Float32BufferAttribute } from 'three';
 import { areaToGeometry, curveToGeometry, generateSphere } from '../util/curve';
+import { showInfo } from '../info';
 
 import earthVertexShader from './earth-vertex.glsl?raw';
 import earthFragmentShader from './earth-fragment.glsl?raw';
@@ -10,7 +11,7 @@ import riverFragmentShader from './river-fragment.glsl?raw';
 import areaFragmentShader from './area-fragment.glsl?raw';
 import arrowFragmentShader from './arrow-fragment.glsl?raw';
 import iceFragmentShader from './ice-fragment.glsl?raw';
-import { showInfo } from '../info';
+import borderFragmentShader from './border-fragment.glsl?raw';
 
 export interface EarthItem {
   remove: () => void;
@@ -31,6 +32,7 @@ export interface EarthArea extends EarthItem {
   coordinates: [number, number][];
   area: Mesh;
   label?: EarthLabel;
+  points?: Mesh[];
 }
 
 export interface EarthLabel {
@@ -56,6 +58,8 @@ const AREA_COLORS = [
   new Vector3(251 / 255, 140 / 255, 0 / 255),
   new Vector3(244 / 255, 81 / 255, 30 / 255),
 ];
+
+const BORDER_OPACITY = 0.05;
 
 export function getAreaColor(name: string) {
   const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -84,8 +88,10 @@ export class Earth {
   bounds: DOMRect;
 
   labels: EarthLabel[] = [];
+  markers: EarthMarker[] = [];
   arrows: EarthArrow[] = [];
   areas: EarthArea[] = [];
+  itemsVisible = true;
 
   earth: Mesh;
 
@@ -93,6 +99,7 @@ export class Earth {
   riverMaterial: ShaderMaterial;
   arrowMaterial: ShaderMaterial;
   iceMaterial: ShaderMaterial;
+  borderMaterial: ShaderMaterial;
 
   climate!: FetchClimateResult;
   heightTexture!: Texture;
@@ -111,6 +118,7 @@ export class Earth {
 
   iceMeshes: Mesh[][] = [];
   existingIceMeshes: Mesh[] = [];
+  iceVisible = true;
 
   constructor(
     wrapper: HTMLDivElement,
@@ -141,7 +149,7 @@ export class Earth {
 
     this.scene = new Scene();
 
-    this.camera = new PerspectiveCamera(45, this.bounds.width / this.bounds.height, 0.01, 100);
+    this.camera = new PerspectiveCamera(45, this.bounds.width / this.bounds.height, 0.01, 1000);
     this.cameraCoordinate = this.getLatLon(new Vector2(0, 0))!;
 
     this.controls = new OrbitControls(this.camera, this.overlay);
@@ -198,6 +206,17 @@ export class Earth {
       },
       depthWrite: true,
       depthTest: false
+    });
+
+    this.borderMaterial = new ShaderMaterial({
+      vertexShader: earthVertexShader,
+      fragmentShader: borderFragmentShader,
+      uniforms: {
+        color: { value: new Vector3(0, 0, 0) },
+        transparency: { value: BORDER_OPACITY },
+        projectionBlend: { value: this.projectionBlend }
+      },
+      transparent: true
     });
 
     this.initControls();
@@ -272,6 +291,25 @@ export class Earth {
 
     this.updateIce();
 
+    // Create borders
+
+    const borderGroup = new Group();
+    console.log(this.climate.borders);
+
+    for (const border of this.climate.borders) {
+      if (border.length <= 2) continue;
+
+      const points = border.map(([latitude, longitude]) => coordinateToVec3(latitude, longitude).multiplyScalar(1.001));
+
+      const geometry = new BufferGeometry();
+      geometry.setAttribute("position", new Float32BufferAttribute(points.flatMap(point => [point.x, point.y, point.z]), 3));
+
+      const line = new Line(geometry, this.borderMaterial);
+      borderGroup.add(line);
+    }
+
+    this.scene.add(borderGroup);
+
     this.render();
   }
 
@@ -301,6 +339,8 @@ export class Earth {
     for (const mesh of this.iceMeshes[iceYear]) {
       this.scene.add(mesh);
       this.existingIceMeshes.push(mesh);
+
+      mesh.visible = this.iceVisible;
     }
   }
 
@@ -474,6 +514,22 @@ export class Earth {
     requestAnimationFrame(() => this.animate());
   }
 
+  // Automatically rotate the camera around the globe at x seconds per rotation
+  rotate(seconds: number) {
+    const rotationSpeed = 2 * Math.PI / seconds;
+
+    const animate = () => {
+      this.camera.position.applyAxisAngle(new Vector3(0, 1, 0), rotationSpeed / 60);
+      this.camera.lookAt(new Vector3(0, 0, 0));
+
+      this.render();
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  }
+
   getNormalisedMouse(event: MouseEvent) {
     const rect = this.overlay.getBoundingClientRect();
 
@@ -566,6 +622,7 @@ export class Earth {
     this.riverMaterial.uniforms.projectionBlend.value = projectionBlend;
     this.arrowMaterial.uniforms.projectionBlend.value = projectionBlend;
     this.iceMaterial.uniforms.projectionBlend.value = projectionBlend;
+    this.borderMaterial.uniforms.projectionBlend.value = projectionBlend;
 
     for (const area of this.areas) {
       (area.area.material as ShaderMaterial).uniforms.projectionBlend.value = projectionBlend;
@@ -577,29 +634,40 @@ export class Earth {
 
   // Latitude and longitude are in degrees
   addMarker(coordinate: [number, number], text: string, info?: Document): EarthMarker {
-    const marker = new Mesh(
+    const mesh = new Mesh(
       new SphereGeometry(0.005, 32, 32),
       new MeshBasicMaterial({ color: 0x000000 })
     );
 
-    marker.position.copy(coordinateToVec3(coordinate[0], coordinate[1]));
+    mesh.position.copy(coordinateToVec3(coordinate[0], coordinate[1]));
 
-    this.scene.add(marker);
+    this.scene.add(mesh);
 
-    const label = this.addLabel(text, marker.position, info);
+    const label = this.addLabel(text, mesh.position, info);
+
+    // Visibility
+    mesh.visible = this.itemsVisible;
+    if (label) label.element.style.visibility = this.itemsVisible ? "visible" : "hidden";
 
     this.render();
 
-    return {
-      marker,
+    const marker = {
+      marker: mesh,
       label,
       remove: () => {
-        this.scene.remove(marker);
+        this.scene.remove(mesh);
         this.removeLabel(label);
+
+        const index = this.markers.indexOf(marker);
+        if (index !== -1) this.markers.splice(index, 1);
 
         this.render();
       }
     };
+
+    this.markers.push(marker);
+
+    return marker;
   }
 
   addArrow(coordinates: [number, number][], text?: string, info?: Document): EarthArrow {
@@ -620,6 +688,10 @@ export class Earth {
       const middle = curvePoints[Math.floor(curvePoints.length / 2)];
       label = this.addLabel(text, middle, info);
     }
+
+    // Visibility
+    arrowMesh.visible = this.itemsVisible;
+    if (label) label.element.style.visibility = this.itemsVisible ? "visible" : "hidden";
 
     this.render();
 
@@ -699,6 +771,11 @@ export class Earth {
       });
     }
 
+    // Visibility
+    areaMesh.visible = this.itemsVisible;
+    if (label) label.element.style.visibility = this.itemsVisible ? "visible" : "hidden";
+    if (points) points.forEach(point => point.visible = this.itemsVisible);
+
     this.render();
 
     const area = {
@@ -721,5 +798,52 @@ export class Earth {
     this.areas.push(area);
 
     return area;
+  }
+
+  toggleBorders() {
+    const visible = this.borderMaterial.uniforms.transparency.value > 0;
+    this.borderMaterial.uniforms.transparency.value = visible ? 0 : BORDER_OPACITY;
+
+    this.render();
+  }
+
+  toggleRivers() {
+    this.riverMaterial.visible = !this.riverMaterial.visible;
+
+    this.render();
+  }
+
+  toggleIce() {
+    this.iceVisible = !this.iceVisible;
+
+    for (const mesh of this.existingIceMeshes) {
+      mesh.visible = this.iceVisible;
+    }
+
+    this.render();
+  }
+
+  toggleItems() {
+    this.itemsVisible = !this.itemsVisible;
+
+    for (const label of this.labels) {
+      label.element.style.visibility = this.itemsVisible ? "visible" : "hidden";
+      console.log(label.element.style.display);
+    }
+
+    for (const marker of this.markers) {
+      marker.marker.visible = this.itemsVisible;
+    }
+
+    for (const arrow of this.arrows) {
+      arrow.arrow.visible = this.itemsVisible;
+    }
+
+    for (const area of this.areas) {
+      area.area.visible = this.itemsVisible;
+      if (area.points) area.points.forEach(point => point.visible = this.itemsVisible);
+    }
+
+    this.render();
   }
 }

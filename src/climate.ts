@@ -24,11 +24,12 @@ function createTexture(data: Uint8Array, width: number, height: number, channels
 }
 
 export async function fetchClimate() {
-  const [climateBytes, sealevelFloats, iceBytes, riverBytes] = await Promise.all([
+  const [climateBytes, sealevelFloats, iceBytes, riverBytes, bordersBytes] = await Promise.all([
     fetchBytes("climate.bin"),
     fetchFloats("sealevels.bin"),
     fetchBytes("ice_outline.bin"),
-    fetchBytes("rivers.bin")
+    fetchBytes("rivers.bin"),
+    fetchBytes("borders.bin"),
   ]);
 
   const years = [];
@@ -182,6 +183,34 @@ export async function fetchClimate() {
     rivers.push(river);
   }
 
+  // Load borders
+  const borders = [];
+  const borderData = new DataView(bordersBytes.buffer);
+
+  function uint16ToCoord(uint16: number) {
+    // Map from 0 to 65535 to -180 to 180
+    return (uint16 / 65535 * 360) - 180;
+  }
+
+  for (let i = 0; i < bordersBytes.length;) {
+    const length = borderData.getUint32(i, true);
+    i += 4;
+
+    const border = [];
+
+    for (let j = 0; j < length; j++) {
+      const lon = uint16ToCoord(borderData.getUint16(i, true));
+      i += 2;
+
+      const lat = uint16ToCoord(borderData.getUint16(i, true));
+      i += 2;
+
+      border.push([lat, lon]);
+    }
+
+    borders.push(border);
+  }
+
   return {
     years: years,
     climateTextures: {
@@ -191,6 +220,7 @@ export async function fetchClimate() {
     sealevels: sealevelFloats,
     rivers: rivers,
     iceGeometries: iceGeometries,
+    borders: borders,
   };
 }
 
