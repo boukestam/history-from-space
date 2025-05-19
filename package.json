@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "vite build --base=/human-history/ && gh-pages -d dist"
+    "deploy": "vite build --base=/history-from-space/ && gh-pages -d dist"
   },
   "dependencies": {
     "@preact/preset-vite": "^2.9.3",
