@@ -2,7 +2,9 @@
 An interactive model of Earth over the last 100,000 years. It visualizes changing sea levels, climate, and ice sheets using scientific datasets and WebGL (via THREE.js).
 
 🌍 [Live demo](https://technistuff.com/history-from-space/)
+
 📖 [Read the blog post](https://technistuff.com/posts/visualizing-100000-years-of-earth-in-webgl/)
+
 📹 [Watch the video](https://www.youtube.com/watch?v=srO5sq4_Mxw)
 
 ## Features
@@ -22,8 +24,6 @@ yarn
 yarn dev
 ```
 
-Then open `localhost:3000`
-
 ## Data Sources
 
 - Elevation: NOAA ETOPO
@@ -36,5 +36,6 @@ See the blog for full source links and processing details.
 
 ## License
 MIT — do whatever you want, but attribution is appreciated.
+
 Data may have separate licenses (check source links).
 
