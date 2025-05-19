@@ -36,6 +36,8 @@ export class Timeline {
     color: string;
   }[] = [];
 
+  showItems: boolean = true;
+
   constructor(
     canvas: HTMLCanvasElement,
     onYearChange: (year: number) => void
@@ -52,7 +54,7 @@ export class Timeline {
 
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-    this.year = 0;
+    this.year = -15000;
     this.minYear = MIN_YEAR;
     this.maxYear = MAX_YEAR;
 
@@ -194,39 +196,41 @@ export class Timeline {
       }
     }
 
-    const renderedPeriods = [];
+    if (this.showItems) {
+      const renderedPeriods = [];
 
-    for (const period of this.periods) {
-      if (period.location.period[1] < this.minYear || period.location.period[0] > this.maxYear) continue;
+      for (const period of this.periods) {
+        if (period.location.period[1] < this.minYear || period.location.period[0] > this.maxYear) continue;
 
-      const x1 = this.yearToX(period.location.period[0]);
-      const x2 = this.yearToX(period.location.period[1]);
+        const x1 = this.yearToX(period.location.period[0]);
+        const x2 = this.yearToX(period.location.period[1]);
 
-      // Check for overlapping periods
-      const overlap = renderedPeriods.filter(p => p.x1 < x2 && p.x2 > x1).length;
+        // Check for overlapping periods
+        const overlap = renderedPeriods.filter(p => p.x1 < x2 && p.x2 > x1).length;
 
-      const height = 4;
-      const y = 20 + overlap * height;
+        const height = 4;
+        const y = 20 + overlap * height;
 
-      this.ctx.fillStyle = period.color;
-      this.ctx.fillRect(x1, y, x2 - x1, height);
+        this.ctx.fillStyle = period.color;
+        this.ctx.fillRect(x1, y, x2 - x1, height);
 
-      renderedPeriods.push({ x1, x2 });
-    }
+        renderedPeriods.push({ x1, x2 });
+      }
 
-    for (const marker of this.events) {
-      const x = this.yearToX(marker.event.time);
+      for (const marker of this.events) {
+        const x = this.yearToX(marker.event.time);
 
-      const markerRadius = 12;
-      const markerImageSize = 16;
-      const markerY = 30;
+        const markerRadius = 12;
+        const markerImageSize = 16;
+        const markerY = 30;
 
-      this.ctx.fillStyle = marker.event.icon.color;
-      this.ctx.beginPath();
-      this.ctx.arc(x, markerY, markerRadius, 0, Math.PI * 2);
-      this.ctx.fill();
+        this.ctx.fillStyle = marker.event.icon.color;
+        this.ctx.beginPath();
+        this.ctx.arc(x, markerY, markerRadius, 0, Math.PI * 2);
+        this.ctx.fill();
 
-      this.ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
+        this.ctx.drawImage(marker.image, x - markerImageSize / 2, markerY - markerImageSize / 2, markerImageSize, markerImageSize);
+      }
     }
 
     const x = this.yearToX(this.year);
@@ -468,5 +472,10 @@ export class Timeline {
   setTarget(newTarget: number) {
     this.target = newTarget;
     this.update();
+  }
+
+  toggleItems() {
+    this.showItems = !this.showItems;
+    this.render();
   }
 }

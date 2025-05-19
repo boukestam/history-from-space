@@ -54,6 +54,7 @@ async function init() {
     `;
   } else {
     earth.toggleItems();
+    timeline.toggleItems();
 
     style.textContent = `
       .h-header {
